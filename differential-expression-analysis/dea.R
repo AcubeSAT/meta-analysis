@@ -18,7 +18,7 @@ cel_affybatch <- ReadAffy(filenames = list.celfiles(
 
 arrayQualityMetrics(
     expressionset = cel_affybatch,
-    outdir = here(qc_data_dir, "QC_Report_Affybatch"),
+    outdir = here(qc_data_dir, "qc-report-affybatch"),
     force = TRUE,
     do.logtransform = TRUE
 )
@@ -29,7 +29,7 @@ arrayQualityMetrics(
     expressionset = eset_rma,
     outdir = here(
         qc_data_dir,
-        "QC_Report_RMA"
+        "qc-report-rma"
     ),
     force = TRUE
 )
@@ -37,6 +37,6 @@ arrayQualityMetrics(
 eset_gcrma <- gcrma(cel_affybatch, type = "fullmodel")
 arrayQualityMetrics(
     expressionset = eset_gcrma,
-    outdir = here(qc_data_dir, "QC_Report_gcRMA"),
+    outdir = here(qc_data_dir, "qc-report-gcrma"),
     force = TRUE
 )
