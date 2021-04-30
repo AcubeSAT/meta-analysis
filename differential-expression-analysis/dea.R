@@ -4,6 +4,9 @@ library(here)
 library(gcrma)
 
 
+# Make sure to launch the R process from the
+# project’s top-level directory for here() to work.
+# If you can't do that, feel free to play with rprojroot.
 raw_data_dir <- here(
     "data",
     "raw",
