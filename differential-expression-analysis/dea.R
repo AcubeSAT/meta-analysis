@@ -23,17 +23,6 @@ arrayQualityMetrics(
     do.logtransform = TRUE
 )
 
-
-eset_rma <- rma(cel_affybatch)
-arrayQualityMetrics(
-    expressionset = eset_rma,
-    outdir = here(
-        qc_data_dir,
-        "qc-report-rma"
-    ),
-    force = TRUE
-)
-
 eset_gcrma <- gcrma(cel_affybatch, type = "fullmodel")
 arrayQualityMetrics(
     expressionset = eset_gcrma,
