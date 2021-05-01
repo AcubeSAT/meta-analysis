@@ -1,17 +1,19 @@
 library(affy)
 library(arrayQualityMetrics)
 library(here)
-# library(yeast2probe)
+library(yeast2probe)
 
 
 # Make sure to launch the R process from the
 # project’s top-level directory for here() to work.
-# If you can't do that, feel free to play with rprojroot.
+# If you can't do that, feel free to play with rprojroot:
+# https://github.com/jennybc/here_here#tldr
 
 # Set up related paths.
 
 # Dataset taken from the GeneLab platform entry:
 # https://genelab-data.ndc.nasa.gov/genelab/accession/GLDS-62/
+# Requires user login/registration.
 raw_data_dir <- here(
     "data",
     "raw",
@@ -46,8 +48,10 @@ s_cerevisiae_df <- extract_ids(probe_filter)
 
 cleancdf <- cleancdfname(cel_affybatch@cdfName)
 probe_package_name <- "yeast2probe"
-# Use the mask to edit the affybatch in-place,
-# removing the pombe probesets.
+# Use the mask to edit the affybatch in-place, removing the pombe probe sets.
+# This is needed, since the was created using the Affymetrix Yeast Genome 2.0,
+# which also contains probe sets for Schizosaccharomyces pombe:
+# https://www.affymetrix.com/support/technical/datasheets/yeast2_datasheet.pdf
 remove_probes(probe_filter, cleancdf, probe_package_name)
 
 arrayQualityMetrics(
@@ -58,6 +62,8 @@ arrayQualityMetrics(
 )
 
 eset_rma <- rma(cel_affybatch)
+# No need for do.logtransform, since the expression measure from affy::rma
+# is already being given in log base 2 scale.
 arrayQualityMetrics(
     expressionset = eset_rma,
     outdir = here(
