@@ -15,6 +15,7 @@ extract_ids <- function(probe_filter) {
     probes <- names(genenames)
 
     # Get all transcript ids from yeast2annotation.csv.
+    # http://www.affymetrix.com/Auth/analysis/downloads/na24/ivt/Yeast2.na24.annot.csv.zip
     annotation_data_dir <- here(
         "data",
         "annotation",
