@@ -1,6 +1,8 @@
 library(affy)
+library(AnnotationDbi)
 library(arrayQualityMetrics)
 library(here)
+library(yeast2.db)
 library(yeast2probe)
 
 
@@ -72,3 +74,16 @@ arrayQualityMetrics(
     ),
     force = TRUE
 )
+
+# List all data retreivable from the ChipDb AnnotationDb.
+columns(yeast2.db)
+# Example annotation.
+annotated_data <- select(
+    yeast2.db,
+    # keys = (featureNames(eset_rma)),
+    keys = head(keys(yeast2.db, keytype = "PROBEID")),
+    columns = c("ALIAS", "GENENAME"),
+    keytype = "PROBEID"
+)
+annotated_data <- subset(annotated_data, !is.na(ALIAS))
+head(annotated_data)
