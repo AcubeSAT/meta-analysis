@@ -77,6 +77,10 @@ arrayQualityMetrics(
     force = TRUE
 )
 
+# Note there is no need to filter low-expressed genes.
+# There is no median intensity below 4, a common threshold.
+eset_medians <- rowMedians(exprs(eset_rma))
+
 # Adapted from maEndtoEnd
 # http://bioconductor.org/packages/devel/workflows/html/maEndToEnd.html
 # An end to end workflow for differential gene expression
