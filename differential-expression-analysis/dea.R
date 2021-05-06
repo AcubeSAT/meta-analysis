@@ -112,3 +112,10 @@ fData(eset_final)$PROBEID <- rownames(fData(eset_final))
 fData(eset_final) <- left_join(fData(eset_final), annotated_data)
 # Restore the rownames after performing the left join.
 rownames(fData(eset_final)) <- fData(eset_final)$PROBEID
+
+# Remove control probe sets prior to the DEA.
+control_affymetrix <- grep("AFFX", featureNames(eset_final))
+eset_final <- eset_final[-control_affymetrix, ]
+
+control_rptr <- grep("RPTR", featureNames(eset_final))
+eset_final <- eset_final[-control_rest, ]
