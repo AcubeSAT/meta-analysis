@@ -117,5 +117,5 @@ rownames(fData(eset_final)) <- fData(eset_final)$PROBEID
 control_affymetrix <- grep("AFFX", featureNames(eset_final))
 eset_final <- eset_final[-control_affymetrix, ]
 
-control_rptr <- grep("RPTR", featureNames(eset_final))
+control_reporter_genes <- grep("RPTR", featureNames(eset_final))
 eset_final <- eset_final[-control_rest, ]
