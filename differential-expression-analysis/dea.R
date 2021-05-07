@@ -118,4 +118,4 @@ control_affymetrix <- grep("AFFX", featureNames(eset_final))
 eset_final <- eset_final[-control_affymetrix, ]
 
 control_reporter_genes <- grep("RPTR", featureNames(eset_final))
-eset_final <- eset_final[-control_rest, ]
+eset_final <- eset_final[-control_reporter_genes, ]
