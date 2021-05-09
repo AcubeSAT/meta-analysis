@@ -39,7 +39,7 @@ cel_affybatch <- ReadAffy(filenames = list.celfiles(
 
 # Read in the S. cerevisiae mask provided by Affymetrix.
 # http://www.affymetrix.com/Auth/support/downloads/maskfiles/scerevisiae.zip
-s_cerevisiae_mask <- read.table(
+s_cerevisiae_mask <- read.de_genes(
     mask_data_dir,
     skip = 2,
     stringsAsFactors = FALSE
@@ -183,12 +183,16 @@ summary(results)
 
 # Grab DE genes with a FDR (Benjamini-Hochberg adjusted p-values),
 # as well as with a absolute log2 fold-change cutoff.
-table <- topTable(data_fit_eb,
+de_genes <- topde_genes(data_fit_eb,
     coef = "micro vs ground",
     adjust.method = "BH",
     p.value = .05,
     lfc = .9
 )
 
-top_upregulated <- table[table[, "logFC"] > .9, ]
-top_downregulated <- table[table[, "logFC"] < -.9, ]
+upregulated_cutoff <- de_genes[de_genes[, "logFC"] > .9, ]
+downregulated_cutoff <- de_genes[de_genes[, "logFC"] < -.9, ]
+
+# Grab the DE genes as produced by limma::decideTests()
+upregulated_dtests <- subset(results, results[, 4] == 1)
+downregulated_dtests <- subset(results, results[, 4] == -1)
