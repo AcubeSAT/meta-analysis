@@ -183,7 +183,7 @@ summary(results)
 
 # Grab DE genes with a FDR (Benjamini-Hochberg adjusted p-values),
 # as well as with a absolute log2 fold-change cutoff.
-de_genes <- topde_genes(data_fit_eb,
+de_genes <- topTable(data_fit_eb,
     coef = "micro vs ground",
     adjust.method = "BH",
     p.value = .05,
