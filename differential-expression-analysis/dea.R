@@ -124,3 +124,62 @@ eset_final <- eset_final[-control_affymetrix, ]
 
 control_reporter_genes <- grep("RPTR", featureNames(eset_final))
 eset_final <- eset_final[-control_reporter_genes, ]
+
+# Group membership for all samples.
+# Ground vs microgravity, WT vs FLO1 vs FLO8.
+group_membership_ground <- "00011100011000111"
+sml <- strsplit(group_membership_ground, split = "")[[1]]
+
+group_membership_wt <- "00000011111222222"
+sml2 <- strsplit(group_membership_wt, split = "")[[1]]
+
+# Factorize both grouping variables.
+gs <- factor(sml)
+gs2 <- factor(sml2)
+
+# Add levels to the factors.
+groups <- make.names(c("onground", "micro"))
+levels(gs) <- groups
+groups2 <- make.names(c("WT", "FLO1", "FLO8"))
+levels(gs2) <- groups2
+
+# Create a paired-test design matrix.
+# Linear model equation:
+# onground * WT mean + micro * offset + difference(FLO8 - FLO1- WT)
+paired_design_matrix <- model.matrix(~ gs + gs2)
+colnames(paired_design_matrix) <- c(
+    "intercept",
+    "FLO1vsWT",
+    "FLO8vsWT",
+    "micro vs ground"
+)
+
+# Fit multiple linear models by generalized least squares.
+# Least squares is used instead of robust regression,
+# because only three replicates are available.
+# Due to the low number of replicates (common in microarray datasets),
+# using the robust estimation could remove real variation,
+# resulting to more false-positives.
+data_fit <- lmFit(eset_final, paired_design_matrix)
+
+# From a general linear model fit,
+# compute moderated t-statistics, moderated F-statistic and
+# log-odds of differential expression by empirical Bayes moderation
+# of the standard errors towards a common value.
+
+# Based on: Smyth, G. K. (2004).
+# Linear models and empirical bayes methods for
+# assessing differential expression in microarray experiments.
+# Statistical applications in genetics and molecular biology, 3(1).
+data_fit_eb <- eBayes(data_fit, robust = TRUE)
+
+# Generate the volcano plot for the "micro vs ground" linear model coefficient.
+volcanoplot(data_fit_eb, coef = 4, highlight = 10)
+
+# Identify the significantly differentially expressed genes for each contrast,
+# from the fit object with the p-values etc.
+results <- decideTests(data_fit_eb)
+summary(results)
+
+# First 10 top-ranked genes from the linear model fit.
+topTable(data_fit_eb, coef = "micro vs ground", n = 10)
