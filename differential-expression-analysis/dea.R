@@ -91,21 +91,26 @@ annotated_data <- select(
     columns = c("PROBEID", "ENSEMBL", "GENENAME"),
     keytype = "PROBEID"
 )
-# Filter out probes that do not map to a gene.
-# yeast2.db doesn't have SYMBOL.
-# However, ENSEMBL also maps to ENTREZ.
-annotated_data <- subset(annotated_data, !is.na(ENSEMBL))
 
 # Grab transcript-cluster identifiers that map to multiple gene identifiers.
-annotated_grouped <- group_by(annotated_data, PROBEID)
-annotated_summarized <-
-    dplyr::summarize(annotated_grouped, no_of_matches = n_distinct(ENSEMBL))
-annotated_filtered <- filter(annotated_summarized, no_of_matches > 1)
-probe_stats <- annotated_filtered
+annotated_mul_mapping <- annotated_data %>%
+    group_by(PROBEID) %>%
+    summarize(no_of_matches = n_distinct(ENSEMBL)) %>%
+    filter(no_of_matches > 1)
+
+# Grab probes that do not map to a gene.
+# yeast2.db doesn't have SYMBOL.
+# However, ENSEMBL also maps to ENTREZ.
+annotated_no_ensembl <- annotated_data %>%
+    filter(is.na(ENSEMBL))
 
 # Generate an expression set without the probes with multiple mappings.
-ids_to_exclude <- (featureNames(eset_rma) %in% probe_stats$PROBEID)
-eset_final <- subset(eset_rma, !ids_to_exclude)
+mul_mapping_ids <- (featureNames(eset_rma) %in% annotated_mul_mapping$PROBEID)
+eset_final <- subset(eset_rma, !mul_mapping_ids)
+
+# Remove the probes that do not map to an ENSEMBL/ENTREZ ID.
+no_ensembl_ids <- (featureNames(eset_rma) %in% annotated_no_ensembl$PROBEID)
+eset_final <- subset(eset_final, !no_ensembl_ids)
 
 # Get the feature data only for the filtered probes.
 fData(eset_final)$PROBEID <- rownames(fData(eset_final))
