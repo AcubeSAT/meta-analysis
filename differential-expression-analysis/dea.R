@@ -181,5 +181,14 @@ volcanoplot(data_fit_eb, coef = 4, highlight = 10)
 results <- decideTests(data_fit_eb)
 summary(results)
 
-# First 10 top-ranked genes from the linear model fit.
-topTable(data_fit_eb, coef = "micro vs ground", n = 10)
+# Grab DE genes with a FDR (Benjamini-Hochberg adjusted p-values),
+# as well as with a absolute log2 fold-change cutoff.
+table <- topTable(data_fit_eb,
+    coef = "micro vs ground",
+    adjust.method = "BH",
+    p.value = .05,
+    lfc = .9
+)
+
+top_upregulated <- table[table[, "logFC"] > .9, ]
+top_downregulated <- table[table[, "logFC"] < -.9, ]
