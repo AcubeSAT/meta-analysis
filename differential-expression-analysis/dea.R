@@ -1,18 +1,37 @@
-# Import order matters for masking, take care.
-library(dplyr)
-library(affy)
-library(AnnotationDbi)
-library(arrayQualityMetrics)
-library(here)
-library(yeast2.db)
-library(yeast2probe)
-library(limma)
-
-
 # Make sure to launch the R process from the
 # project top-level directory for here() to work.
 # If you can't do that, feel free to play with rprojroot:
 # https://github.com/jennybc/here_here#tldr
+
+suppressPackageStartupMessages(library(docopt))
+
+"DEA script for GLDS-62 GeneLab entry.
+
+Usage:
+  dea.R
+  dea.R (-h | --help)
+  dea.R --version
+  dea.R --qc [pre|post]
+
+Options:
+  -h --help     Show this screen.
+  --version     Show version.
+  --qc          Produce QC reports.
+
+" -> doc
+arguments <- docopt(doc, version = "DEA 0.1")
+
+# Import order matters for masking, take care.
+suppressPackageStartupMessages({
+    library(dplyr)
+    library(affy)
+    library(AnnotationDbi)
+    library(arrayQualityMetrics)
+    library(here)
+    library(yeast2.db)
+    library(yeast2probe)
+    library(limma)
+})
 
 # Set up related paths.
 
@@ -59,28 +78,34 @@ probe_package_name <- "yeast2probe"
 # https://www.affymetrix.com/support/technical/datasheets/yeast2_datasheet.pdf
 remove_probes(probe_filter, cleancdf, probe_package_name)
 
-arrayQualityMetrics(
-    expressionset = cel_affybatch,
-    outdir = here(qc_data_dir, "qc-report-affybatch"),
-    force = TRUE,
-    do.logtransform = TRUE
-)
+if (arguments$qc && !(arguments$post)) {
+    arrayQualityMetrics(
+        expressionset = cel_affybatch,
+        outdir = here(qc_data_dir, "qc-report-affybatch"),
+        force = TRUE,
+        do.logtransform = TRUE
+    )
+}
 
 eset_rma <- rma(cel_affybatch)
+
 # No need for do.logtransform, since the expression measure from affy::rma
 # is already being given in log base 2 scale.
-arrayQualityMetrics(
-    expressionset = eset_rma,
-    outdir = here(
-        qc_data_dir,
-        "qc-report-rma"
-    ),
-    force = TRUE
-)
+if (arguments$qc && !(arguments$pre)) {
+    arrayQualityMetrics(
+        expressionset = eset_rma,
+        outdir = here(
+            qc_data_dir,
+            "qc-report-rma"
+        ),
+        force = TRUE
+    )
+}
 
 # Note there is no need to filter low-expressed genes.
 # There is no median intensity below 4, a common threshold.
-eset_medians <- rowMedians(exprs(eset_rma))
+# eset_medians <- rowMedians(exprs(eset_rma))
+
 # Adapted from maEndtoEnd
 # http://bioconductor.org/packages/devel/workflows/html/maEndToEnd.html
 # An end to end workflow for differential gene expression
