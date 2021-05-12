@@ -6,6 +6,7 @@ library(arrayQualityMetrics)
 library(here)
 library(yeast2.db)
 library(yeast2probe)
+library(limma)
 
 
 # Make sure to launch the R process from the
@@ -39,7 +40,7 @@ cel_affybatch <- ReadAffy(filenames = list.celfiles(
 
 # Read in the S. cerevisiae mask provided by Affymetrix.
 # http://www.affymetrix.com/Auth/support/downloads/maskfiles/scerevisiae.zip
-s_cerevisiae_mask <- read.de_genes(
+s_cerevisiae_mask <- read.table(
     mask_data_dir,
     skip = 2,
     stringsAsFactors = FALSE
@@ -80,7 +81,6 @@ arrayQualityMetrics(
 # Note there is no need to filter low-expressed genes.
 # There is no median intensity below 4, a common threshold.
 eset_medians <- rowMedians(exprs(eset_rma))
-
 # Adapted from maEndtoEnd
 # http://bioconductor.org/packages/devel/workflows/html/maEndToEnd.html
 # An end to end workflow for differential gene expression
@@ -98,19 +98,9 @@ annotated_mul_mapping <- annotated_data %>%
     summarize(no_of_matches = n_distinct(ENSEMBL)) %>%
     filter(no_of_matches > 1)
 
-# Grab probes that do not map to a gene.
-# yeast2.db doesn't have SYMBOL.
-# However, ENSEMBL also maps to ENTREZ.
-annotated_no_ensembl <- annotated_data %>%
-    filter(is.na(ENSEMBL))
-
 # Generate an expression set without the probes with multiple mappings.
 mul_mapping_ids <- (featureNames(eset_rma) %in% annotated_mul_mapping$PROBEID)
 eset_final <- subset(eset_rma, !mul_mapping_ids)
-
-# Remove the probes that do not map to an ENSEMBL/ENTREZ ID.
-no_ensembl_ids <- (featureNames(eset_rma) %in% annotated_no_ensembl$PROBEID)
-eset_final <- subset(eset_final, !no_ensembl_ids)
 
 # Get the feature data only for the filtered probes.
 fData(eset_final)$PROBEID <- rownames(fData(eset_final))
@@ -124,6 +114,12 @@ eset_final <- eset_final[-control_affymetrix, ]
 
 control_reporter_genes <- grep("RPTR", featureNames(eset_final))
 eset_final <- eset_final[-control_reporter_genes, ]
+
+# yeast2.db doesn't have SYMBOL.
+# However, ENSEMBL also maps to ENTREZ.
+# Remove the probes that do not map to an ENSEMBL/ENTREZ ID.
+no_ensembl_ids <- is.na(fData(eset_final)$ENSEMBL)
+eset_final <- eset_final[!no_ensembl_ids, ]
 
 # Group membership for all samples.
 # Ground vs microgravity, WT vs FLO1 vs FLO8.
