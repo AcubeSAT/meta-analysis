@@ -12,11 +12,13 @@ Usage:
   dea.R (-h | --help)
   dea.R --version
   dea.R --qc [pre|post]
+  dea.R --plots
 
 Options:
   -h --help     Show this screen.
   --version     Show version.
   --qc          Produce QC reports.
+  --plots       Produce DEA plots.
 
 " -> doc
 arguments <- docopt(doc, version = "DEA 0.1")
@@ -48,8 +50,12 @@ mask_data_dir <- here(
     "mask",
     "s_cerevisiae.msk"
 )
+
 qc_data_dir <- here("qc")
 helpers_dir <- here("helpers.R")
+
+results_dir <- here("results")
+plots_dir <- here(results_dir, "plots")
 
 # Read in the .CEL files generated from the Affymetrix.
 cel_affybatch <- ReadAffy(filenames = list.celfiles(
@@ -104,7 +110,6 @@ if (arguments$qc && !(arguments$pre)) {
 
 # Note there is no need to filter low-expressed genes.
 # There is no median intensity below 4, a common threshold.
-# eset_medians <- rowMedians(exprs(eset_rma))
 
 # Adapted from maEndtoEnd
 # http://bioconductor.org/packages/devel/workflows/html/maEndToEnd.html
@@ -161,7 +166,7 @@ eset_final$group <- gs
 
 # Create an independent t-test design matrix.
 # Linear model equation:
-# TODO
+# y = mean(on ground) + mean(micro)
 design_matrix <- model.matrix(~ group + 0, eset_final)
 # Overwrite the default generated column names.
 colnames(design_matrix) <- levels(gs)
@@ -177,7 +182,7 @@ fit <- lmFit(eset_final, design_matrix)
 # Set up contrasts of interest and recalculate model coefficients.
 contrast <- paste(groups[1], groups[2], sep = "-")
 contrast_matrix <- makeContrasts(contrasts = contrast, levels = design_matrix)
-# Re-orientates the fitted model from the coefficients of the
+# Re-orientate the fitted model from the coefficients of the
 # design matrix to the set of contrasts of the original coefficients.
 fit2 <- contrasts.fit(fit, contrast_matrix)
 
@@ -221,7 +226,15 @@ results <- decideTests(fit_eb,
     lfc = .9
 )
 
-# Generate a volcano plot in the working directory 
-# log2 fold-change cut-off of 0.9 is used 
-volcanoplot(fit_eb, coef=1, main=colnames(fit_eb)[1], pch=20,
-  highlight=length(which(results[,1]!=0)), names=rep('+', nrow(fit_eb)))
+if (arguments$plots) {
+    ct <- 1
+    pdf(file = here(plots_dir, "volcano.pdf"))
+    volcanoplot(fit_eb,
+        coef = ct,
+        main = colnames(fit_eb)[ct],
+        pch = 20,
+        highlight = length(which(results[, ct] != 0)),
+        names = rep("+", nrow(fit_eb))
+    )
+    dev.off()
+}
