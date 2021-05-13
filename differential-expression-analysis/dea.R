@@ -221,5 +221,7 @@ results <- decideTests(fit_eb,
     lfc = .9
 )
 
+# Generate a volcano plot in the working directory 
+# log2 fold-change cut-off of 0.9 is used 
 volcanoplot(fit_eb, coef=1, main=colnames(fit_eb)[1], pch=20,
   highlight=length(which(results[,1]!=0)), names=rep('+', nrow(fit_eb)))
