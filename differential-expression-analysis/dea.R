@@ -220,3 +220,6 @@ results <- decideTests(fit_eb,
     p.value = .05,
     lfc = .9
 )
+
+volcanoplot(fit_eb, coef=1, main=colnames(fit_eb)[1], pch=20,
+  highlight=length(which(results[,1]!=0)), names=rep('+', nrow(fit_eb)))
