@@ -34,6 +34,7 @@ suppressPackageStartupMessages({
     library(yeast2.db)
     library(yeast2probe)
     library(limma)
+    library(EnhancedVolcano)
 })
 
 # Set up related paths.
@@ -231,6 +232,14 @@ results <- decideTests(fit_eb,
     lfc = .9
 )
 
+if (arguments$qc || arguments$plots) {
+    full_tt <- topTable(fit_eb,
+        adjust.method = "BH",
+        sort.by = "B",
+        number = Inf
+    )
+}
+
 # Histogram of the adjusted p-value distribution
 # meant for QC of the test results.
 # See https://www.ncbi.nlm.nih.gov/pmc/articles/PMC6164648/ or
@@ -240,14 +249,8 @@ results <- decideTests(fit_eb,
 # is most genes are not differentially expressed.
 if (arguments$qc) {
     if (!qc_selected || arguments$t) {
-        qc_tt <- topTable(fit_eb,
-            adjust.method = "BH",
-            sort.by = "B",
-            number = Inf
-        )
-
         pdf(file = here(qc_data_dir, "p-val-hist.pdf"))
-        hist(qc_tt$P.Value,
+        hist(full_tt$P.Value,
             breaks = "Scott",
             col = "grey",
             border = "white",
@@ -258,7 +261,7 @@ if (arguments$qc) {
         invisible(dev.off())
 
         pdf(file = here(qc_data_dir, "adj-p-val-hist.pdf"))
-        hist(qc_tt$adj.P.Val,
+        hist(full_tt$adj.P.Val,
             breaks = "Scott",
             col = "grey",
             border = "white",
@@ -323,5 +326,46 @@ if (arguments$plots) {
     coolmap(eset_final[rownames(de_genes), ],
         labRow = de_genes$GENENAME
     )
+    invisible(dev.off())
+
+    # Force EnhancedVolcano to return a plot object instead of a ggplot one.
+    # Idea from https://github.com/kevinblighe/EnhancedVolcano/issues/3
+    pdf(file = here(plots_dir, "p-val-volcano.pdf"))
+    plot(EnhancedVolcano(full_tt,
+        lab = full_tt$GENENAME,
+        x = "logFC",
+        y = "P.Value",
+        ylab = bquote(~ -Log[10] ~ "  P-value"),
+        ylim = c(0, 8),
+        selectLab = de_genes$GENENAME,
+        title = "On-ground vs Microgravity",
+        pCutoff = .05,
+        FCcutoff = .9,
+        pointSize = 1.2,
+        labSize = 5.0,
+        colAlpha = .8,
+        boxedLabels = TRUE,
+        labCol = "black",
+        labFace = "bold",
+        cutoffLineType = "blank",
+        cutoffLineCol = "black", cutoffLineWidth = .8,
+        hline = c(.05, .005, .0005, .00005),
+        hlineCol = c("black"),
+        hlineType = c("dotted"),
+        gridlines.major = TRUE,
+        gridlines.minor = FALSE,
+        legendLabels = c(
+            "Non-significant",
+            "FC",
+            "P-value",
+            "P-value & FC"
+        ),
+        legendPosition = "bottom",
+        legendLabSize = 14,
+        legendIconSize = 4.0,
+        drawConnectors = TRUE,
+        widthConnectors = .85,
+        colConnectors = "black"
+    ))
     invisible(dev.off())
 }
