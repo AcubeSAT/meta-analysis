@@ -283,4 +283,16 @@ if (arguments$plots) {
         names = rep("+", nrow(fit_eb))
     )
     invisible(dev.off())
+
+    # Generate MD plot (log2 fold-change vs mean log2 expression).
+    # Highlight statistically significant (p-adj < .05) probes.
+    pdf(file = here(plots_dir, "MD.pdf"))
+    plotMD(fit_eb,
+        column = ct,
+        status = results[, ct],
+        legend = F,
+        pch = 20,
+        cex = 1
+    )
+    invisible(dev.off())
 }
