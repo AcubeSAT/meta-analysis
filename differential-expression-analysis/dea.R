@@ -233,7 +233,8 @@ results <- decideTests(fit_eb,
 
 # Histogram of the adjusted p-value distribution
 # meant for QC of the test results.
-# See https://www.ncbi.nlm.nih.gov/pmc/articles/PMC6164648/
+# See https://www.ncbi.nlm.nih.gov/pmc/articles/PMC6164648/ or
+# http://varianceexplained.org/statistics/interpreting-pvalue-histogram/
 
 # Normal test assumption (limma::eBayes proportion)
 # is most genes are not differentially expressed.
@@ -244,12 +245,24 @@ if (arguments$qc) {
             sort.by = "B",
             number = Inf
         )
+
+        pdf(file = here(qc_data_dir, "p-val-hist.pdf"))
+        hist(qc_tt$P.Value,
+            breaks = "Scott",
+            col = "grey",
+            border = "white",
+            xlab = "p-val",
+            ylab = "Number of genes",
+            main = "p-value distribution"
+        )
+        invisible(dev.off())
+
         pdf(file = here(qc_data_dir, "adj-p-val-hist.pdf"))
         hist(qc_tt$adj.P.Val,
             breaks = "Scott",
             col = "grey",
             border = "white",
-            xlab = "P-adj",
+            xlab = "p-adj",
             ylab = "Number of genes",
             main = "Adjusted p-value distribution"
         )
