@@ -11,7 +11,7 @@ Usage:
   dea.R
   dea.R (-h | --help)
   dea.R --version
-  dea.R --qc [pre|post]
+  dea.R --qc [-r] [-n] [-t] [--plots]
   dea.R --plots
 
 Options:
@@ -22,6 +22,7 @@ Options:
 
 " -> doc
 arguments <- docopt(doc, version = "DEA 0.1")
+qc_selected <- any(arguments$r, arguments$n, arguments$t)
 
 # Import order matters for masking, take care.
 suppressPackageStartupMessages({
@@ -84,28 +85,32 @@ probe_package_name <- "yeast2probe"
 # https://www.affymetrix.com/support/technical/datasheets/yeast2_datasheet.pdf
 remove_probes(probe_filter, cleancdf, probe_package_name)
 
-if (arguments$qc && !(arguments$post)) {
-    arrayQualityMetrics(
-        expressionset = cel_affybatch,
-        outdir = here(qc_data_dir, "qc-report-affybatch"),
-        force = TRUE,
-        do.logtransform = TRUE
-    )
+if (arguments$qc) {
+    if (!qc_selected || arguments$r) {
+        arrayQualityMetrics(
+            expressionset = cel_affybatch,
+            outdir = here(qc_data_dir, "qc-report-affybatch"),
+            force = TRUE,
+            do.logtransform = TRUE
+        )
+    }
 }
 
 eset_rma <- rma(cel_affybatch)
 
 # No need for do.logtransform, since the expression measure from affy::rma
 # is already being given in log base 2 scale.
-if (arguments$qc && !(arguments$pre)) {
-    arrayQualityMetrics(
-        expressionset = eset_rma,
-        outdir = here(
-            qc_data_dir,
-            "qc-report-rma"
-        ),
-        force = TRUE
-    )
+if (arguments$qc) {
+    if (!qc_selected || arguments$n) {
+        arrayQualityMetrics(
+            expressionset = eset_rma,
+            outdir = here(
+                qc_data_dir,
+                "qc-report-rma"
+            ),
+            force = TRUE
+        )
+    }
 }
 
 # Note there is no need to filter low-expressed genes.
@@ -226,7 +231,35 @@ results <- decideTests(fit_eb,
     lfc = .9
 )
 
+# Histogram of the adjusted p-value distribution
+# meant for QC of the test results.
+# See https://www.ncbi.nlm.nih.gov/pmc/articles/PMC6164648/
+
+# Normal test assumption (limma::eBayes proportion)
+# is most genes are not differentially expressed.
+if (arguments$qc) {
+    if (!qc_selected || arguments$t) {
+        qc_tt <- topTable(fit_eb,
+            adjust.method = "BH",
+            sort.by = "B",
+            number = Inf
+        )
+        pdf(file = here(qc_data_dir, "adj-p-val-hist.pdf"))
+        hist(qc_tt$adj.P.Val,
+            breaks = "Scott",
+            col = "grey",
+            border = "white",
+            xlab = "P-adj",
+            ylab = "Number of genes",
+            main = "Adjusted p-value distribution"
+        )
+        dev.off()
+    }
+}
+
 if (arguments$plots) {
+    # Generate volcanoplot with the DE genes as selected from the
+    # adjusted p-value and log2 fold-change cutoff.
     ct <- 1
     pdf(file = here(plots_dir, "volcano.pdf"))
     volcanoplot(fit_eb,
