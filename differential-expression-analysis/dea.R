@@ -254,6 +254,19 @@ if (arguments$qc) {
             main = "Adjusted p-value distribution"
         )
         dev.off()
+
+        # Filter out probes with invalid moderated F-statistics.
+        good_test_probes <- which(!is.na(fit_eb$F))
+        # Quantile-Quantile plot for the moderated t-statistics.
+        pdf(file = here(
+            qc_data_dir,
+            "q-q-mod-t-stat.pdf"
+        ))
+        qqt(fit_eb$t[good_test_probes],
+            fit_eb$df.total[good_test_probes],
+            main = "Moderated t-statistics"
+        )
+        dev.off()
     }
 }
 
