@@ -300,4 +300,15 @@ if (arguments$plots) {
     pdf(file = here(plots_dir, "venn.pdf"))
     vennDiagram(results, circle.col = palette())
     invisible(dev.off())
+
+    # Generate heatmap where genes are clustered by
+    # relative changes in expression, in order to plot the DE genes.
+    # To cluster together genes with similar DE patterns,
+    # the genes are clustered by Pearson correlation,
+    # and the log-expression values are mean-corrected by rows for the plot.
+    pdf(file = here(plots_dir, "heatmap.pdf"))
+    coolmap(eset_final[rownames(de_genes), ],
+        labRow = de_genes$GENENAME
+    )
+    invisible(dev.off())
 }
