@@ -294,5 +294,10 @@ if (arguments$plots) {
         pch = 20,
         cex = 1
     )
+    abline(h = 0)
+    invisible(dev.off())
+
+    pdf(file = here(plots_dir, "venn.pdf"))
+    vennDiagram(results, circle.col = palette())
     invisible(dev.off())
 }
