@@ -253,7 +253,7 @@ if (arguments$qc) {
             ylab = "Number of genes",
             main = "Adjusted p-value distribution"
         )
-        dev.off()
+        invisible(dev.off())
 
         # Filter out probes with invalid moderated F-statistics.
         good_test_probes <- which(!is.na(fit_eb$F))
@@ -266,7 +266,7 @@ if (arguments$qc) {
             fit_eb$df.total[good_test_probes],
             main = "Moderated t-statistics"
         )
-        dev.off()
+        invisible(dev.off())
     }
 }
 
@@ -282,5 +282,5 @@ if (arguments$plots) {
         highlight = length(which(results[, ct] != 0)),
         names = rep("+", nrow(fit_eb))
     )
-    dev.off()
+    invisible(dev.off())
 }
