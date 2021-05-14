@@ -35,6 +35,7 @@ suppressPackageStartupMessages({
     library(yeast2probe)
     library(limma)
     library(EnhancedVolcano)
+    library(ggplot2)
 })
 
 # Set up related paths.
@@ -328,10 +329,8 @@ if (arguments$plots) {
     )
     invisible(dev.off())
 
-    # Force EnhancedVolcano to return a plot object instead of a ggplot one.
-    # Idea from https://github.com/kevinblighe/EnhancedVolcano/issues/3
     pdf(file = here(plots_dir, "p-val-volcano.pdf"))
-    plot(EnhancedVolcano(full_tt,
+    ev <- EnhancedVolcano(full_tt,
         lab = full_tt$GENENAME,
         x = "logFC",
         y = "P.Value",
@@ -339,6 +338,9 @@ if (arguments$plots) {
         ylim = c(0, 8),
         selectLab = de_genes$GENENAME,
         title = "On-ground vs Microgravity",
+        subtitle = "Differential Expression",
+        caption = bquote(~ Log[2] ~
+        "fold change cutoff, 0.9; p-value cutoff, 0.05"),
         pCutoff = .05,
         FCcutoff = .9,
         pointSize = 1.2,
@@ -348,7 +350,8 @@ if (arguments$plots) {
         labCol = "black",
         labFace = "bold",
         cutoffLineType = "blank",
-        cutoffLineCol = "black", cutoffLineWidth = .8,
+        cutoffLineCol = "black",
+        cutoffLineWidth = .8,
         hline = c(.05, .005, .0005, .00005),
         hlineCol = c("black"),
         hlineType = c("dotted"),
@@ -366,6 +369,14 @@ if (arguments$plots) {
         drawConnectors = TRUE,
         widthConnectors = .85,
         colConnectors = "black"
-    ))
+    )
+    ev +
+        coord_cartesian(xlim = c(-2.5, 2.5)) +
+        scale_x_continuous(
+            breaks = seq(-2.5, 2.5, .25)
+        )
+    # Force EnhancedVolcano to return a plot object instead of a ggplot one.
+    # Idea from https://github.com/kevinblighe/EnhancedVolcano/issues/3
+    plot(ev)
     invisible(dev.off())
 }
