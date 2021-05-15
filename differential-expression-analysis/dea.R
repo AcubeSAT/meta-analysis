@@ -25,6 +25,10 @@ arguments <- docopt(doc, version = "DEA 0.1")
 qc_selected <- any(arguments$r, arguments$n, arguments$t)
 
 # Import order matters for masking, take care.
+# To identify conflicts used by ambiguous function names,
+# you can use conflicted by r-lib, loading it into session
+# and slowly working your way through the script. See more:
+# https://github.com/r-lib/conflicted
 suppressPackageStartupMessages({
     library(dplyr)
     library(affy)
@@ -122,7 +126,7 @@ if (arguments$qc) {
 # http://bioconductor.org/packages/devel/workflows/html/maEndToEnd.html
 # An end to end workflow for differential gene expression
 # using Affymetrix microarrays
-annotated_data <- select(
+annotated_data <- AnnotationDbi::select(
     yeast2.db,
     keys = featureNames(eset_rma),
     columns = c("PROBEID", "ENSEMBL", "GENENAME"),
@@ -133,7 +137,7 @@ annotated_data <- select(
 annotated_mul_mapping <- annotated_data %>%
     group_by(PROBEID) %>%
     summarize(no_of_matches = n_distinct(ENSEMBL)) %>%
-    filter(no_of_matches > 1)
+    dplyr::filter(no_of_matches > 1)
 
 # Generate an expression set without the probes with multiple mappings.
 mul_mapping_ids <- (featureNames(eset_rma) %in% annotated_mul_mapping$PROBEID)
