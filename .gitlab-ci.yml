@@ -12,8 +12,9 @@ cache:
 
 before_script:
   - apt-get update
-  - apt-get purge -y libopenblas-base
   - apt-get install -y --no-install-recommends ${APT_PKGS}
+  # Change from OpenBLAS to the reference BLAS implementation.
+  - update-alternatives --set libblas.so.3-x86_64-linux-gnu /usr/lib/x86_64-linux-gnu/blas/libblas.so.3
   # Utilize all cores for installing R packages.
   - echo "options(Ncpus = $(nproc --all))" >> /usr/local/lib/R/etc/Rprofile.site
   - Rscript -e "sessionInfo()"
