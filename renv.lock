@@ -43,6 +43,12 @@
       "Repository": "CRAN",
       "Hash": "87a690190741d0791c9c10b390c933ff"
     },
+    "BiocVersion": {
+      "Package": "BiocVersion",
+      "Version": "3.12.0",
+      "Source": "Bioconductor",
+      "Hash": "ee4d027afb8f52fec1f46b9f0a8660e9"
+    },
     "Biostrings": {
       "Package": "Biostrings",
       "Version": "2.58.0",
