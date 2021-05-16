@@ -9,11 +9,11 @@ cache:
     - ${RENV_PATHS_CACHE}
     - ${RENV_PATHS_LIBRARY}
 
-image: rocker/r-ver:latest
-
 before_script:
   - Rscript -e "if (!requireNamespace('renv', quietly = TRUE)) install.packages('renv')"
   - Rscript -e "renv::restore()"
 
-script:
-  - Rscript differential-expression-analysis/dea.R
+run:
+  image: rocker/r-ver:latest
+  script:
+      - Rscript differential-expression-analysis/dea.R
