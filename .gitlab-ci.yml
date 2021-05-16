@@ -13,8 +13,7 @@ cache:
 before_script:
   - apt-get update
   - apt-get install -y --no-install-recommends ${APT_PKGS}
-  # Change from OpenBLAS to the reference BLAS implementation.
-  - update-alternatives --set libblas.so.3-x86_64-linux-gnu /usr/lib/x86_64-linux-gnu/blas/libblas.so.3
+  # TODO: look into https://github.com/eddelbuettel/mkl4deb/issues/8
   # Utilize all cores for installing R packages.
   - echo "options(Ncpus = $(nproc --all))" >> /usr/local/lib/R/etc/Rprofile.site
   - Rscript -e "sessionInfo()"
@@ -27,4 +26,4 @@ after_script:
 run:
   image: rocker/r-ver:latest
   script:
-      - Rscript differential-expression-analysis/dea.R --qc --plots
+      - Rscript differential-expression-analysis/dea.R --plots
