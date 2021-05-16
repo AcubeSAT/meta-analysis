@@ -1,5 +1,5 @@
 variables:
-  APT_PKGS: "zlib1g-dev libcairo2-dev"
+  APT_PKGS: "zlib1g-dev libcairo2-dev libxt-dev"
   # RENV_CONFIG_REPOS_OVERRIDE: "http://cran.r-project.org"
   RENV_PATHS_CACHE: ${CI_PROJECT_DIR}/cache
   RENV_PATHS_LIBRARY: ${CI_PROJECT_DIR}/renv/library
