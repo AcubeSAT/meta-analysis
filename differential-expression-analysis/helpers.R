@@ -18,6 +18,7 @@ extract_ids <- function(probe_filter) {
     # http://www.affymetrix.com/Auth/analysis/downloads/na24/ivt/Yeast2.na24.annot.csv.zip
     # Requires user login/registration.
     annotation_data_dir <- here(
+        "differential-expression-analysis",
         "data",
         "annotation",
         "Yeast_2.na24.annot.csv"

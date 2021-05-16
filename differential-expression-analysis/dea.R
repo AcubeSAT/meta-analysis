@@ -48,20 +48,22 @@ suppressPackageStartupMessages({
 # https://genelab-data.ndc.nasa.gov/genelab/accession/GLDS-62/
 # Requires user login/registration.
 raw_data_dir <- here(
+    "differential-expression-analysis",
     "data",
     "raw",
     "GLDS-62_microarray_E-GEOD-64468.raw.1"
 )
 mask_data_dir <- here(
+    "differential-expression-analysis",
     "data",
     "mask",
     "s_cerevisiae.msk"
 )
 
-qc_data_dir <- here("qc")
-helpers_dir <- here("helpers.R")
+qc_data_dir <- here("differential-expression-analysis", "qc")
+helpers_dir <- here("differential-expression-analysis", "helpers.R")
 
-results_dir <- here("results")
+results_dir <- here("differential-expression-analysis", "results")
 plots_dir <- here(results_dir, "plots")
 
 # Read in the .CEL files generated from the Affymetrix.
