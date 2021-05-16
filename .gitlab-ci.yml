@@ -15,8 +15,12 @@ before_script:
   - apt-get install -y --no-install-recommends ${APT_PKGS}
   # Utilize all cores for installing R packages.
   - echo "options(Ncpus = $(nproc --all))" >> /usr/local/lib/R/etc/Rprofile.site
+  - Rscript -e "sessionInfo()"
   - Rscript -e "if (!requireNamespace('renv', quietly = TRUE)) install.packages('renv')"
   - Rscript -e "renv::restore()"
+
+after_script:
+  - Rscript -e "sessionInfo()"
 
 run:
   image: rocker/r-ver:latest
