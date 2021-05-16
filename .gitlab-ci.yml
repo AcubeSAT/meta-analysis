@@ -12,6 +12,7 @@ cache:
 
 before_script:
   - apt-get update
+  - apt-get purge -y libopenblas-base
   - apt-get install -y --no-install-recommends ${APT_PKGS}
   # Utilize all cores for installing R packages.
   - echo "options(Ncpus = $(nproc --all))" >> /usr/local/lib/R/etc/Rprofile.site
