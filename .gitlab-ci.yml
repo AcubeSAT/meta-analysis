@@ -13,6 +13,7 @@ cache:
 before_script:
   - apt-get update
   - apt-get install -y --no-install-recommends ${APT_PKGS}
+  # Utilize all cores for installing R packages.
   - echo "options(Ncpus = $(nproc --all))" >> /usr/local/lib/R/etc/Rprofile.site
   - Rscript -e "if (!requireNamespace('renv', quietly = TRUE)) install.packages('renv')"
   - Rscript -e "renv::restore()"
@@ -20,4 +21,4 @@ before_script:
 run:
   image: rocker/r-ver:latest
   script:
-      - Rscript differential-expression-analysis/dea.R
+      - Rscript differential-expression-analysis/dea.R --qc --plots

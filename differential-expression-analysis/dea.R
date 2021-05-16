@@ -40,6 +40,7 @@ suppressPackageStartupMessages({
     library(limma)
     library(EnhancedVolcano)
     library(ggplot2)
+    library(yeast2cdf)
 })
 
 # Set up related paths.

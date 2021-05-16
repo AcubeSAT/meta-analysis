@@ -1026,6 +1026,12 @@
       "Source": "Bioconductor",
       "Hash": "0c6b65cc95a1bc077bba4885bf2f445c"
     },
+    "yeast2cdf": {
+      "Package": "yeast2cdf",
+      "Version": "2.18.0",
+      "Source": "Bioconductor",
+      "Hash": "cd54fef973e9cf890be7ede7dba947cc"
+    },
     "yeast2probe": {
       "Package": "yeast2probe",
       "Version": "2.18.0",
