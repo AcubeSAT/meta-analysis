@@ -1,5 +1,5 @@
 variables:
-  APT_PKGS: "zlib1g-dev libcairo2-dev libxt-dev libproj-dev libcurl4-openssl-dev libssl-dev libharfbuzz-dev libfribidi-dev libfreetype6-dev libpng-dev libtiff5-dev libjpeg-dev"
+  APT_PKGS: "zlib1g-dev libcairo2-dev libxt-dev libproj-dev libcurl4-openssl-dev libssl-dev libharfbuzz-dev libfribidi-dev libfreetype6-dev libpng-dev libtiff5-dev libjpeg-dev libxml2-dev"
   # RENV_CONFIG_REPOS_OVERRIDE: "http://cran.r-project.org"
   RENV_PATHS_CACHE: ${CI_PROJECT_DIR}/cache
   RENV_PATHS_LIBRARY: ${CI_PROJECT_DIR}/renv/library
@@ -13,6 +13,7 @@ cache:
 before_script:
   - apt-get update
   - apt-get install -y --no-install-recommends ${APT_PKGS}
+  - echo "options(Ncpus = $(nproc --all))" >> /usr/local/lib/R/etc/Rprofile.site
   - Rscript -e "if (!requireNamespace('renv', quietly = TRUE)) install.packages('renv')"
   - Rscript -e "renv::restore()"
 
