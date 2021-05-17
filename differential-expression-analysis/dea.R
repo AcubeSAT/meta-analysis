@@ -8,11 +8,11 @@ suppressPackageStartupMessages(library(docopt))
 "DEA script for GLDS-62 GeneLab entry.
 
 Usage:
-  dea.R [--silent]
+  dea.R [--silent | --no-color]
   dea.R (-h | --help)
   dea.R --version
-  dea.R --qc [-r] [-n] [-t] [--plots] [--silent]
-  dea.R --plots [--silent]
+  dea.R --qc [-r] [-n] [-t] [--plots] [--silent | --no-color]
+  dea.R --plots [--silent | --no-color]
 
 Options:
   -h --help     Show this screen.
@@ -42,16 +42,24 @@ suppressPackageStartupMessages({
     library(ggplot2)
     library(yeast2cdf)
     library(biomaRt)
+    library(crayon)
 })
 
-# Set up related paths.
+if(!any(arguments$silent, arguments$no_color)) {
+    emphasis <- red $ bold
+}
 
+# TODO: encapsulate all of this into a custom function.
+if(!arguments$silent) {
+    if(!arguments$no_color) {
+        cat(blue("Setting up ") %+% emphasis("paths") %+% blue("...\n"))
+    } else {
+    cat("Setting up paths...\n")
+    }
+}
 # Dataset taken from the GeneLab platform entry:
 # https://genelab-data.ndc.nasa.gov/genelab/accession/GLDS-62/
 # Requires user login/registration.
-if(!arguments$silent) {
-    cat("Setting up paths...\n")
-}
 raw_data_dir <- here(
     "differential-expression-analysis",
     "data",
@@ -72,7 +80,11 @@ results_dir <- here("differential-expression-analysis", "results")
 plots_dir <- here(results_dir, "plots")
 
 if(!arguments$silent) {
+    if(!arguments$no_color) {
+        cat(blue("Reading in ") %+% emphasis("CEL ") %+% blue("files...\n"))
+    } else {
     cat("Reading in CEL files...\n")
+    }
 }
 # Read in the .CEL files generated from the Affymetrix.
 cel_affybatch <- ReadAffy(filenames = list.celfiles(
@@ -81,7 +93,11 @@ cel_affybatch <- ReadAffy(filenames = list.celfiles(
 ))
 
 if(!arguments$silent) {
+    if(!arguments$no_color) {
+        cat(blue("Reading in ") %+% emphasis("maskfile") %+% blue("...\n"))
+    } else {
     cat("Reading in maskfile...\n")
+    }
 }
 # Read in the S. cerevisiae mask provided by Affymetrix.
 # http://www.affymetrix.com/Auth/support/downloads/maskfiles/scerevisiae.zip
@@ -93,12 +109,20 @@ s_cerevisiae_mask <- read.table(
 probe_filter <- s_cerevisiae_mask[[1]]
 
 if(!arguments$silent) {
+    if(!arguments$no_color) {
+        cat(blue("Loading ") %+% emphasis("helpers ") %+% blue("file...\n"))
+    } else {
     cat("Loading helpers file...\n")
+    }
 }
 source(helpers_dir)
 
 if(!arguments$silent) {
+    if(!arguments$no_color) {
+        cat(emphasis("Removing Pombe ") %+% blue("probe sets...\n"))
+    } else {
     cat("Removing Pombe probe sets...\n")
+    }
 }
 # Grab a dataframe with only the S. cerevisiae data.
 s_cerevisiae_df <- extract_ids(probe_filter)
@@ -114,7 +138,11 @@ remove_probes(probe_filter, cleancdf, probe_package_name)
 if (arguments$qc) {
     if (!qc_selected || arguments$r) {
         if(!arguments$silent) {
+            if(!arguments$no_color) {
+                cat(blue("Generating ") %+% emphasis("QC ") %+% blue("report for ") %+% emphasis("raw ") %+% blue("data...\n"))
+            } else {
             cat("Generating QC report for raw data...\n")
+            }
         }
         arrayQualityMetrics(
             expressionset = cel_affybatch,
@@ -125,7 +153,11 @@ if (arguments$qc) {
     }
 }
 if(!arguments$silent) {
+    if(!arguments$no_color) {
+        cat(emphasis("RMA ") %+% blue("normalizing...\n"))
+    } else {
     cat("RMA normalizing...\n")
+    }
 }
 eset_rma <- rma(cel_affybatch)
 
@@ -134,7 +166,11 @@ eset_rma <- rma(cel_affybatch)
 if (arguments$qc) {
     if (!qc_selected || arguments$n) {
         if(!arguments$silent) {
+            if(!arguments$no_color) {
+                cat(blue("Generating ") %+% emphasis("QC ") %+% blue("report for ") %+% emphasis("normalized ") %+% blue("data...\n"))
+            } else {
             cat("Generating QC report for normalized data...\n")
+            }
         }
         arrayQualityMetrics(
             expressionset = eset_rma,
@@ -154,8 +190,13 @@ if (arguments$qc) {
 # http://bioconductor.org/packages/devel/workflows/html/maEndToEnd.html
 # An end to end workflow for differential gene expression
 # using Affymetrix microarrays
+
 if(!arguments$silent) {
+    if(!arguments$no_color) {
+        cat(emphasis("Annotating ") %+% blue("the expressionset...\n"))
+    } else {
     cat("Annotating the expressionset...\n")
+    }
 }
 annotated_data <- AnnotationDbi::select(
     yeast2.db,
@@ -165,7 +206,11 @@ annotated_data <- AnnotationDbi::select(
 )
 
 if(!arguments$silent) {
+    if(!arguments$no_color) {
+        cat(emphasis("Removing multiple-mapping ") %+% blue("probe sets...\n"))
+    } else {
     cat("Removing multiple-mapping probe sets...\n")
+    }
 }
 # Grab transcript-cluster identifiers that map to multiple gene identifiers.
 annotated_mul_mapping <- annotated_data %>%
@@ -184,7 +229,11 @@ fData(eset_final) <- left_join(fData(eset_final), annotated_data)
 rownames(fData(eset_final)) <- fData(eset_final)$PROBEID
 
 if(!arguments$silent) {
+    if(!arguments$no_color) {
+        cat(emphasis("Removing control ") %+% blue("probe sets...\n"))
+    } else {
     cat("Removing control probe sets...\n")
+    }
 }
 # Remove control probe sets prior to the DEA.
 control_affymetrix <- grep("AFFX", featureNames(eset_final))
@@ -197,7 +246,11 @@ eset_final <- eset_final[-control_reporter_genes, ]
 # However, ENSEMBL also maps to ENTREZ.
 # Remove the probes that do not map to an ENSEMBL/ENTREZ ID.
 if(!arguments$silent) {
+    if(!arguments$no_color) {
+        cat(emphasis("Removing ") %+% blue("probe sets without ") %+% emphasis("ENSEMBL ID") %+% blue("...\n"))
+    } else {
     cat("Removing probe sets without ENSEMBL ID...\n")
+    }
 }
 no_ensembl_ids <- is.na(fData(eset_final)$ENSEMBL)
 eset_final <- eset_final[!no_ensembl_ids, ]
@@ -216,7 +269,11 @@ levels(gs) <- groups
 eset_final$group <- gs
 
 if(!arguments$silent) {
+    if(!arguments$no_color) {
+        cat(blue("Creating ") %+% emphasis("design matrix") %+% blue("...\n"))
+    } else {
     cat("Creating design matrix...\n")
+    }
 }
 # Create an independent t-test design matrix.
 # Linear model equation:
@@ -232,20 +289,32 @@ colnames(design_matrix) <- levels(gs)
 # using the robust estimation could remove real variation,
 # resulting to more false-positives.
 if(!arguments$silent) {
+    if(!arguments$no_color) {
+        cat(emphasis("Fitting ") %+% blue("linear models...\n"))
+    } else {
     cat("Fitting linear models...\n")
+    }
 }
 fit <- lmFit(eset_final, design_matrix)
 
 # Set up contrasts of interest and recalculate model coefficients.
 contrast <- paste(groups[1], groups[2], sep = "-")
 if(!arguments$silent) {
+    if(!arguments$no_color) {
+        cat(blue("Creating ") %+% emphasis("contrast matrix") %+% blue("...\n"))
+    } else {
     cat("Creating contrast matrix...\n")
+    }
 }
 contrast_matrix <- makeContrasts(contrasts = contrast, levels = design_matrix)
 # Re-orientate the fitted model from the coefficients of the
 # design matrix to the set of contrasts of the original coefficients.
 if(!arguments$silent) {
+    if(!arguments$no_color) {
+        cat(emphasis("Re-orientating ") %+% blue("fitted model to the set of contrasts...\n"))
+    } else {
     cat("Re-orientating fitted model to the set of contrasts...\n")
+    }
 }
 fit2 <- contrasts.fit(fit, contrast_matrix)
 
@@ -259,12 +328,20 @@ fit2 <- contrasts.fit(fit, contrast_matrix)
 # assessing differential expression in microarray experiments.
 # Statistical applications in genetics and molecular biology, 3(1).
 if(!arguments$silent) {
+    if(!arguments$no_color) {
+        cat(blue("Computing statistics and metrics by ") %+% emphasis("empirical Bayes") %+% blue("...\n"))
+    } else {
     cat("Computing statistics and metrics by empirical Bayes...\n")
+    }
 }
 fit_eb <- eBayes(fit2, robust = TRUE)
 
 if(!arguments$silent) {
+    if(!arguments$no_color) {
+        cat(emphasis("Selecting DE genes") %+% blue("...\n"))
+    } else {
     cat("Selecting DE genes...\n")
+    }
 }
 # Grab DE genes with a FDR (Benjamini-Hochberg adjusted p-values),
 # as well as with a absolute log2 fold-change cutoff.
@@ -288,7 +365,11 @@ de_genes <- subset(de_genes,
 )
 
 if(!arguments$silent) {
+    if(!arguments$no_color) {
+       cat(blue("Adding ") %+% emphasis("ENTREZ IDs") %+% blue("...\n")) 
+    } else {
     cat("Adding ENTREZ IDs...\n")
+    }
 }
 # Select the Affymetrix Yeast Genome 2.0 database from ensembl,
 # and submit the query for the ENTREZ IDs.
@@ -301,7 +382,11 @@ de_genes$ENTREZ <- getBM(
 )[, 2]
 
 if(!arguments$silent) {
+    if(!arguments$no_color) {
+        cat(blue("Running ") %+% emphasis("decideTests") %+% blue("...\n"))
+    } else {
     cat("Running decideTests...\n")
+    }
 }
 # Identify the significantly differentially expressed genes
 # for each contrast from the fit object with the p-values etc.
@@ -329,7 +414,11 @@ if (arguments$qc || arguments$plots) {
 if (arguments$qc) {
     if (!qc_selected || arguments$t) {
         if(!arguments$silent) {
+            if(!arguments$no_color) {
+                cat(blue("Generating ") %+% emphasis("p-value distribution histogram QC") %+% blue("...\n"))
+            } else {
             cat("Generating p-value distribution histogram QC...\n")
+            }
         }
         pdf(file = here(qc_data_dir, "p-val-hist.pdf"))
         hist(full_tt$P.Value,
@@ -343,7 +432,11 @@ if (arguments$qc) {
         invisible(dev.off())
 
         if(!arguments$silent) {
+            if(!arguments$no_color) {
+                cat(blue("Generating ") %+% emphasis("adj. p-value distribution histogram QC") %+% blue("...\n"))
+            } else {
             cat("Generating adj. p-value distribution histogram QC...\n")
+            }
         }
         pdf(file = here(qc_data_dir, "adj-p-val-hist.pdf"))
         hist(full_tt$adj.P.Val,
@@ -360,7 +453,11 @@ if (arguments$qc) {
         good_test_probes <- which(!is.na(fit_eb$F))
         # Quantile-Quantile plot for the moderated t-statistics.
         if(!arguments$silent) {
+            if(!arguments$no_color) {
+                cat(blue("Generating ") %+% emphasis("Q-Q ") %+% blue("for the mod t-statistics...\n"))
+            } else {
             cat("Generating Q-Q for the mod t-statistics...\n")
+            }
         }
         pdf(file = here(
             qc_data_dir,
@@ -379,7 +476,11 @@ if (arguments$plots) {
     # adjusted p-value and log2 fold-change cutoff.
     ct <- 1
     if(!arguments$silent) {
+        if(!arguments$no_color) {
+            cat(blue("Generating ") %+% emphasis("volcanoplot") %+% blue("...\n"))
+        } else {
         cat("Generating volcanoplot...\n")
+        }
     }
     pdf(file = here(plots_dir, "volcano.pdf"))
     volcanoplot(fit_eb,
@@ -394,7 +495,11 @@ if (arguments$plots) {
     # Generate MD plot (log2 fold-change vs mean log2 expression).
     # Highlight statistically significant (p-adj < .05) probes.
     if(!arguments$silent) {
+        if(!arguments$no_color) {
+            cat(blue("Generating ") %+% emphasis("MD plot") %+% blue("...\n"))
+        } else {
         cat("Generating MD plot...\n")
+        }
     }
     pdf(file = here(plots_dir, "MD.pdf"))
     plotMD(fit_eb,
@@ -408,7 +513,11 @@ if (arguments$plots) {
     invisible(dev.off())
 
     if(!arguments$silent) {
+        if(!arguments$no_color) {
+            cat(blue("Generating ") %+% emphasis("Venn diagram") %+% blue("...\n"))
+        } else {
         cat("Generating Venn diagram...\n")
+        }
     }
     pdf(file = here(plots_dir, "venn.pdf"))
     vennDiagram(results, circle.col = palette())
@@ -420,7 +529,11 @@ if (arguments$plots) {
     # the genes are clustered by Pearson correlation,
     # and the log-expression values are mean-corrected by rows for the plot.
     if(!arguments$silent) {
+        if(!arguments$no_color) {
+            cat(blue("Generating ") %+% emphasis("heatmap") %+% blue("...\n"))
+        } else {
         cat("Generating heatmap...\n")
+        }
     }
     pdf(file = here(plots_dir, "heatmap.pdf"))
     coolmap(eset_final[rownames(de_genes), ],
@@ -429,7 +542,11 @@ if (arguments$plots) {
     invisible(dev.off())
 
     if(!arguments$silent) {
+        if(!arguments$no_color) {
+            cat(blue("Generating ") %+% emphasis("EnhancedVolcano") %+% blue("...\n"))
+        } else {
         cat("Generating EnhancedVolcano...\n")
+        }
     }
     pdf(file = here(plots_dir, "p-val-volcano.pdf"))
     ev <- EnhancedVolcano(full_tt,
