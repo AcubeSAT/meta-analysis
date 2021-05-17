@@ -41,6 +41,7 @@ suppressPackageStartupMessages({
     library(EnhancedVolcano)
     library(ggplot2)
     library(yeast2cdf)
+    library(biomaRt)
 })
 
 # Set up related paths.
@@ -231,6 +232,16 @@ de_genes <- subset(de_genes,
         "GENENAME"
     )
 )
+
+# Select the Affymetrix Yeast Genome 2.0 database from ensembl,
+# and submit the query for the ENTREZ IDs.
+ensembl = useMart("ensembl",dataset="scerevisiae_gene_ensembl")
+de_genes$ENTREZ <- getBM(
+    attributes = c("affy_yeast_2", "entrezgene_id"),
+    filters = "affy_yeast_2",
+    values = de_genes$PROBEID,
+    mart = ensembl
+)[, 2]
 
 # Identify the significantly differentially expressed genes
 # for each contrast from the fit object with the p-values etc.

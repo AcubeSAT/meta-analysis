@@ -26,4 +26,4 @@ after_script:
 run:
   image: rocker/r-ver:latest
   script:
-      - Rscript differential-expression-analysis/dea.R --plots
+      - Rscript differential-expression-analysis/dea.R --qc --plots
