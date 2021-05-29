@@ -1,5 +1,5 @@
 variables:
-  APT_PKGS: "zlib1g-dev libcairo2-dev libxt-dev libproj-dev libcurl4-openssl-dev libssl-dev libharfbuzz-dev libfribidi-dev libfreetype6-dev libpng-dev libtiff5-dev libjpeg-dev libxml2-dev"
+  APT_DEPENDENCIES: "zlib1g-dev libcairo2-dev libxt-dev libproj-dev libcurl4-openssl-dev libssl-dev libharfbuzz-dev libfribidi-dev libfreetype6-dev libpng-dev libtiff5-dev libjpeg-dev libxml2-dev"
   # RENV_CONFIG_REPOS_OVERRIDE: "http://cran.r-project.org"
   RENV_PATHS_CACHE: ${CI_PROJECT_DIR}/cache
   RENV_PATHS_LIBRARY: ${CI_PROJECT_DIR}/renv/library
@@ -12,11 +12,15 @@ cache:
 
 before_script:
   - apt-get update
-  - apt-get install -y --no-install-recommends ${APT_PKGS}
-  # TODO: look into https://github.com/eddelbuettel/mkl4deb/issues/8
+  - apt-get install -y --no-install-recommends ${APT_DEPENDENCIES}
   # Utilize all cores for installing R packages.
   - echo "options(Ncpus = $(nproc --all))" >> /usr/local/lib/R/etc/Rprofile.site
   - Rscript -e "sessionInfo()"
+  # Fix for RSQLite being wonkers: https://support.bioconductor.org/p/9136329/#9136330
+  - Rscript -e 'install.packages("remotes"); remotes::install_version("RSQLite", version = "2.2.5")'
+  # Fix the affy::rma() pthread_22 ErrorCode from preprocessCore rma_bg_correct
+  # https://github.com/bmbolstad/preprocessCore/issues/7
+  - Rscript -e 'BiocManager::install("preprocessCore", configure.args="--disable-threading", force = TRUE)'
   - Rscript -e "if (!requireNamespace('renv', quietly = TRUE)) install.packages('renv')"
   - Rscript -e "renv::restore()"
 
@@ -26,4 +30,4 @@ after_script:
 run:
   image: rocker/r-ver:latest
   script:
-      - Rscript differential-expression-analysis/dea.R --qc --plots
+    - Rscript differential-expression-analysis/dea.R --qc --plots

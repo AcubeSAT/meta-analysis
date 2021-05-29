@@ -48,3 +48,7 @@ po/*~
 ### Other
 # Apple Desktop Services Store
 */.DS_Store
+
+# Out-of-the-box running gitlab-runner locally
+# https://github.com/firecow/gitlab-ci-local
+.gitlab-ci-local/
