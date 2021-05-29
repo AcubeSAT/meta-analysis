@@ -16,13 +16,14 @@ before_script:
   # Utilize all cores for installing R packages.
   - echo "options(Ncpus = $(nproc --all))" >> /usr/local/lib/R/etc/Rprofile.site
   - Rscript -e "sessionInfo()"
-  # Fix for RSQLite being wonkers: https://support.bioconductor.org/p/9136329/#9136330
-  - Rscript -e 'install.packages("remotes"); remotes::install_version("RSQLite", version = "2.2.5")'
   # Fix the affy::rma() pthread_22 ErrorCode from preprocessCore rma_bg_correct
   # https://github.com/bmbolstad/preprocessCore/issues/7
-  - Rscript -e "if (!requireNamespace('BiocManager', quietly = TRUE)) install.packages('BiocManager'); BiocManager::install('preprocessCore', configure.args='--disable-threading', force = TRUE)"
+  # - Rscript -e "if (!requireNamespace('BiocManager', quietly = TRUE)) install.packages('BiocManager'); BiocManager::install('preprocessCore', configure.args='--disable-threading', force = TRUE)"
+  - Rscript -e 'Sys.setenv(R_THREADS=4)'
   - Rscript -e "if (!requireNamespace('renv', quietly = TRUE)) install.packages('renv')"
   - Rscript -e "renv::restore()"
+  # Fix for RSQLite being wonkers: https://support.bioconductor.org/p/9136329/#9136330
+  - Rscript -e 'install.packages("remotes"); remotes::install_version("RSQLite", version = "2.2.5")'
 
 after_script:
   - Rscript -e "sessionInfo()"
