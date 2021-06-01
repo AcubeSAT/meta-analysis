@@ -1,36 +1,7 @@
-variables:
-  APT_DEPENDENCIES: "zlib1g-dev libcairo2-dev libxt-dev libproj-dev libcurl4-openssl-dev libssl-dev libharfbuzz-dev libfribidi-dev libfreetype6-dev libpng-dev libtiff5-dev libjpeg-dev libxml2-dev"
-  # RENV_CONFIG_REPOS_OVERRIDE: "http://cran.r-project.org"
-  RENV_PATHS_CACHE: ${CI_PROJECT_DIR}/cache
-  RENV_PATHS_LIBRARY: ${CI_PROJECT_DIR}/renv/library
-
-cache:
-  key: ${CI_JOB_NAME}
-  paths:
-    - ${RENV_PATHS_CACHE}
-    - ${RENV_PATHS_LIBRARY}
-
-before_script:
-  - apt-get update
-  - apt-get install -y --no-install-recommends ${APT_DEPENDENCIES}
-  # Utilize all cores for installing R packages.
-  - echo "options(Ncpus = $(nproc --all))" >> /usr/local/lib/R/etc/Rprofile.site
-  - Rscript -e "sessionInfo()"
-  # Fix the affy::rma() pthread_22 ErrorCode from preprocessCore rma_bg_correct
-  # https://github.com/bmbolstad/preprocessCore/issues/7
-  # https://github.com/bmbolstad/preprocessCore/issues/12#issuecomment-786034828
-  - Rscript -e "if (!requireNamespace('BiocManager', quietly = TRUE)) install.packages('BiocManager'); BiocManager::install('preprocessCore', configure.args='--disable-threading', force = TRUE)"
-  - Rscript -e 'Sys.setenv(R_THREADS=10)'
-  - Rscript -e "if (!requireNamespace('renv', quietly = TRUE)) install.packages('renv')"
-  - Rscript -e "renv::restore()"
-  # Fix for RSQLite being wonkers: https://support.bioconductor.org/p/9136329/#9136330
-  - Rscript -e 'install.packages("remotes"); remotes::install_version("RSQLite", version = "2.2.5")'
-
 after_script:
-  - Rscript -e "sessionInfo()"
+  - R -e "sessionInfo()"
 
 run:
-  image: rocker/r-ver:latest
+  image: xlxs4/meta-analysis:latest
   script:
-    # - Rscript differential-expression-analysis/dea.R --plots
-    - Rscript -e 'cat("Hello, world!\n")'
+      - Rscript differential-expression-analysis/dea.R --qc --plots
