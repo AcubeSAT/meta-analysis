@@ -67,6 +67,7 @@ COPY ./renv.lock .
 # Timeout is for downloading packages; helps when connection is poor.
 # https://rstudio.github.io/renv/reference/consent.html
 # TODO: find a way to either build remotely, or speed the process up locally.
+# TODO: Cut down on image size using https://rstudio.github.io/renv/articles/profiles.html
 RUN R -e "options(renv.consent = TRUE); options(timeout = 300); renv::restore()"
 # RUN R -e "BiocManager::install('preprocessCore', configure.args='--disable-threading', force = TRUE)"
 

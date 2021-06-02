@@ -18,10 +18,10 @@
   </clipPath>
 </defs>
 <g clip-path='url(#cpMC4wMHwzNjAuMDB8MC4wMHwyNTIuMDA=)'>
-<text x='194.40' y='34.67' text-anchor='middle' style='font-size: 14.40px; font-weight: bold; font-family: Arial;' textLength='147.39px' lengthAdjust='spacingAndGlyphs'>RNA degradation plot</text>
-<text x='194.40' y='218.88' text-anchor='middle' style='font-size: 12.00px; font-family: Arial;' textLength='58.60px' lengthAdjust='spacingAndGlyphs'>5' &lt;-----&gt; 3'</text>
-<text x='194.40' y='233.28' text-anchor='middle' style='font-size: 12.00px; font-family: Arial;' textLength='84.72px' lengthAdjust='spacingAndGlyphs'> Probe Number </text>
-<text transform='translate(12.96,118.80) rotate(-90)' text-anchor='middle' style='font-size: 12.00px; font-family: Arial;' textLength='184.80px' lengthAdjust='spacingAndGlyphs'>Mean Intensity : shifted and scaled</text>
+<text x='194.40' y='34.77' text-anchor='middle' style='font-size: 14.40px; font-weight: bold; font-family: DejaVu Sans;' textLength='175.44px' lengthAdjust='spacingAndGlyphs'>RNA degradation plot</text>
+<text x='194.40' y='218.88' text-anchor='middle' style='font-size: 12.00px; font-family: DejaVu Sans;' textLength='71.29px' lengthAdjust='spacingAndGlyphs'>5' &lt;-----&gt; 3'</text>
+<text x='194.40' y='233.28' text-anchor='middle' style='font-size: 12.00px; font-family: DejaVu Sans;' textLength='93.71px' lengthAdjust='spacingAndGlyphs'> Probe Number </text>
+<text transform='translate(12.96,118.80) rotate(-90)' text-anchor='middle' style='font-size: 12.00px; font-family: DejaVu Sans;' textLength='210.18px' lengthAdjust='spacingAndGlyphs'>Mean Intensity : shifted and scaled</text>
 <line x1='89.96' y1='178.56' x2='298.84' y2='178.56' style='stroke-width: 0.75;' />
 <line x1='89.96' y1='178.56' x2='89.96' y2='185.76' style='stroke-width: 0.75;' />
 <line x1='131.73' y1='178.56' x2='131.73' y2='185.76' style='stroke-width: 0.75;' />
@@ -29,23 +29,21 @@
 <line x1='215.29' y1='178.56' x2='215.29' y2='185.76' style='stroke-width: 0.75;' />
 <line x1='257.07' y1='178.56' x2='257.07' y2='185.76' style='stroke-width: 0.75;' />
 <line x1='298.84' y1='178.56' x2='298.84' y2='185.76' style='stroke-width: 0.75;' />
-<text x='89.96' y='204.48' text-anchor='middle' style='font-size: 12.00px; font-family: Arial;' textLength='6.67px' lengthAdjust='spacingAndGlyphs'>0</text>
-<text x='131.73' y='204.48' text-anchor='middle' style='font-size: 12.00px; font-family: Arial;' textLength='6.67px' lengthAdjust='spacingAndGlyphs'>2</text>
-<text x='173.51' y='204.48' text-anchor='middle' style='font-size: 12.00px; font-family: Arial;' textLength='6.67px' lengthAdjust='spacingAndGlyphs'>4</text>
-<text x='215.29' y='204.48' text-anchor='middle' style='font-size: 12.00px; font-family: Arial;' textLength='6.67px' lengthAdjust='spacingAndGlyphs'>6</text>
-<text x='257.07' y='204.48' text-anchor='middle' style='font-size: 12.00px; font-family: Arial;' textLength='6.67px' lengthAdjust='spacingAndGlyphs'>8</text>
-<text x='298.84' y='204.48' text-anchor='middle' style='font-size: 12.00px; font-family: Arial;' textLength='13.35px' lengthAdjust='spacingAndGlyphs'>10</text>
+<text x='89.96' y='204.48' text-anchor='middle' style='font-size: 12.00px; font-family: DejaVu Sans;' textLength='7.64px' lengthAdjust='spacingAndGlyphs'>0</text>
+<text x='131.73' y='204.48' text-anchor='middle' style='font-size: 12.00px; font-family: DejaVu Sans;' textLength='7.64px' lengthAdjust='spacingAndGlyphs'>2</text>
+<text x='173.51' y='204.48' text-anchor='middle' style='font-size: 12.00px; font-family: DejaVu Sans;' textLength='7.64px' lengthAdjust='spacingAndGlyphs'>4</text>
+<text x='215.29' y='204.48' text-anchor='middle' style='font-size: 12.00px; font-family: DejaVu Sans;' textLength='7.64px' lengthAdjust='spacingAndGlyphs'>6</text>
+<text x='257.07' y='204.48' text-anchor='middle' style='font-size: 12.00px; font-family: DejaVu Sans;' textLength='7.64px' lengthAdjust='spacingAndGlyphs'>8</text>
+<text x='298.84' y='204.48' text-anchor='middle' style='font-size: 12.00px; font-family: DejaVu Sans;' textLength='15.28px' lengthAdjust='spacingAndGlyphs'>10</text>
 <line x1='59.04' y1='174.13' x2='59.04' y2='73.37' style='stroke-width: 0.75;' />
 <line x1='59.04' y1='174.13' x2='51.84' y2='174.13' style='stroke-width: 0.75;' />
 <line x1='59.04' y1='148.94' x2='51.84' y2='148.94' style='stroke-width: 0.75;' />
 <line x1='59.04' y1='123.75' x2='51.84' y2='123.75' style='stroke-width: 0.75;' />
 <line x1='59.04' y1='98.56' x2='51.84' y2='98.56' style='stroke-width: 0.75;' />
 <line x1='59.04' y1='73.37' x2='51.84' y2='73.37' style='stroke-width: 0.75;' />
-<text transform='translate(41.76,174.13) rotate(-90)' text-anchor='middle' style='font-size: 12.00px; font-family: Arial;' textLength='6.67px' lengthAdjust='spacingAndGlyphs'>0</text>
-<text transform='translate(41.76,148.94) rotate(-90)' text-anchor='middle' style='font-size: 12.00px; font-family: Arial;' textLength='13.35px' lengthAdjust='spacingAndGlyphs'>10</text>
-<text transform='translate(41.76,123.75) rotate(-90)' text-anchor='middle' style='font-size: 12.00px; font-family: Arial;' textLength='13.35px' lengthAdjust='spacingAndGlyphs'>20</text>
-<text transform='translate(41.76,98.56) rotate(-90)' text-anchor='middle' style='font-size: 12.00px; font-family: Arial;' textLength='13.35px' lengthAdjust='spacingAndGlyphs'>30</text>
-<text transform='translate(41.76,73.37) rotate(-90)' text-anchor='middle' style='font-size: 12.00px; font-family: Arial;' textLength='13.35px' lengthAdjust='spacingAndGlyphs'>40</text>
+<text transform='translate(41.76,174.13) rotate(-90)' text-anchor='middle' style='font-size: 12.00px; font-family: DejaVu Sans;' textLength='7.64px' lengthAdjust='spacingAndGlyphs'>0</text>
+<text transform='translate(41.76,148.94) rotate(-90)' text-anchor='middle' style='font-size: 12.00px; font-family: DejaVu Sans;' textLength='15.28px' lengthAdjust='spacingAndGlyphs'>10</text>
+<text transform='translate(41.76,98.56) rotate(-90)' text-anchor='middle' style='font-size: 12.00px; font-family: DejaVu Sans;' textLength='15.28px' lengthAdjust='spacingAndGlyphs'>30</text>
 </g>
 <defs>
   <clipPath id='cpNTkuMDR8MzI5Ljc2fDU5LjA0fDE3OC41Ng=='>

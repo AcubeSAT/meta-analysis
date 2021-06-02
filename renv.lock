@@ -729,6 +729,13 @@
       "Source": "Bioconductor",
       "Hash": "c5724389cf50c33547ac3fbb44c7ea00"
     },
+    "logger": {
+      "Package": "logger",
+      "Version": "0.2.0",
+      "Source": "Repository",
+      "Repository": "CRAN",
+      "Hash": "67e018a0cdae685cc91a2aec9cd36750"
+    },
     "magrittr": {
       "Package": "magrittr",
       "Version": "2.0.1",
@@ -1113,9 +1120,9 @@
     },
     "yeast2.db": {
       "Package": "yeast2.db",
-      "Version": "3.2.3",
+      "Version": "3.13.0",
       "Source": "Bioconductor",
-      "Hash": "0c6b65cc95a1bc077bba4885bf2f445c"
+      "Hash": "824a34e13b2468da75cffc474f3fa47c"
     },
     "yeast2cdf": {
       "Package": "yeast2cdf",
