@@ -1,3 +1,5 @@
+# TODO: configure the below to switch to a multi-stage build:
+# https://docs.docker.com/develop/develop-images/multistage-build/
 FROM ubuntu:20.04
 
 # Silent and unobtrusive, see man 7 debconf.
@@ -67,5 +69,12 @@ COPY ./renv.lock .
 # TODO: find a way to either build remotely, or speed the process up locally.
 RUN R -e "options(renv.consent = TRUE); options(timeout = 300); renv::restore()"
 # RUN R -e "BiocManager::install('preprocessCore', configure.args='--disable-threading', force = TRUE)"
+
+# Set up locales so that R doesn't complain all the time.
+RUN echo "LC_ALL=en_US.UTF-8" >> /etc/environment &&\
+echo "en_US.UTF-8 UTF-8" >> /etc/locale.gen &&\
+echo "LANG=en_US.UTF-8" > /etc/locale.conf &&\
+apt-get install -y --no-install-recommends locales &&\
+locale-gen en_US.UTF-8
 
 ENTRYPOINT [""]
