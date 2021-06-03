@@ -82,6 +82,12 @@
       "Repository": "CRAN",
       "Hash": "cc8c8c4d61346cde1ca60030ff9c241f"
     },
+    "GO.db": {
+      "Package": "GO.db",
+      "Version": "3.13.0",
+      "Source": "Bioconductor",
+      "Hash": "12b5ea6d297983e1bca954dd1d047220"
+    },
     "GenomeInfoDb": {
       "Package": "GenomeInfoDb",
       "Version": "1.28.0",

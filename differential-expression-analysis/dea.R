@@ -47,6 +47,7 @@ suppressWarnings(suppressPackageStartupMessages({
     library(statmod)
     library(xml2)
     library(gplots)
+    library(GO.db)
 }))
 
 if(arguments$q) {
@@ -81,14 +82,12 @@ results_dir <- here("differential-expression-analysis", "results")
 plots_dir <- here(results_dir, "plots")
 
 log_info("Reading in CEL files...")
-# Read in the .CEL files generated from the Affymetrix.
 cel_affybatch <- ReadAffy(filenames = list.celfiles(
     raw_data_dir,
     full.names = TRUE
 ))
 
 log_info("Reading in maskfile...")
-# Read in the S. cerevisiae mask provided by Affymetrix.
 # http://www.affymetrix.com/Auth/support/downloads/maskfiles/scerevisiae.zip
 s_cerevisiae_mask <- read.table(
     mask_data_dir,
@@ -166,7 +165,6 @@ annotated_mul_mapping <- annotated_data %>%
     summarize(no_of_matches = n_distinct(ENSEMBL)) %>%
     dplyr::filter(no_of_matches > 1)
 
-# Generate an expression set without the probes with multiple mappings.
 mul_mapping_ids <- (featureNames(eset_rma) %in% annotated_mul_mapping$PROBEID)
 eset_final <- subset(eset_rma, !mul_mapping_ids)
 
@@ -177,7 +175,6 @@ fData(eset_final) <- suppressMessages(left_join(fData(eset_final), annotated_dat
 rownames(fData(eset_final)) <- fData(eset_final)$PROBEID
 
 log_info("Removing control probe sets...")
-# Remove control probe sets prior to the DEA.
 control_affymetrix <- grep("AFFX", featureNames(eset_final))
 eset_final <- eset_final[-control_affymetrix, ]
 
@@ -196,10 +193,8 @@ eset_final <- eset_final[!no_ensembl_ids, ]
 group_membership_ground <- "00011100011000111"
 sml <- strsplit(group_membership_ground, split = "")[[1]]
 
-# Factorize.
 gs <- factor(sml)
 
-# Add levels to the factors.
 groups <- make.names(c("onground", "micro"))
 levels(gs) <- groups
 eset_final$group <- gs
@@ -209,7 +204,6 @@ log_info("Creating design matrix...")
 # Linear model equation:
 # y = mean(on ground) + mean(micro)
 design_matrix <- model.matrix(~ group + 0, eset_final)
-# Overwrite the default generated column names.
 colnames(design_matrix) <- levels(gs)
 
 # Fit multiple linear models by generalized least squares.
@@ -230,15 +224,6 @@ contrast_matrix <- makeContrasts(contrasts = contrast, levels = design_matrix)
 log_info("Re-orientating fitted model to the set of contrasts...")
 fit2 <- contrasts.fit(fit, contrast_matrix)
 
-# From a general linear model fit,
-# compute moderated t-statistics, moderated F-statistic and
-# log-odds of differential expression by empirical Bayes moderation
-# of the standard errors towards a common value.
-
-# Based on: Smyth, G. K. (2004).
-# Linear models and empirical bayes methods for
-# assessing differential expression in microarray experiments.
-# Statistical applications in genetics and molecular biology, 3(1).
 log_info("Computing statistics and metrics by empirical Bayes...")
 fit_eb <- eBayes(fit2, robust = TRUE)
 
@@ -276,8 +261,7 @@ de_genes$ENTREZ <- getBM(
 )[, 2]
 
 log_info("Running decideTests...")
-# Identify the significantly differentially expressed genes
-# for each contrast from the fit object with the p-values etc.
+# Identify the significantly differentially expressed genes for each contrast.
 results <- decideTests(fit_eb,
     adjust.method = "BH",
     p.value = .05,
@@ -292,12 +276,27 @@ if (arguments$qc || arguments$plots) {
     )
 }
 
+log_info("Linking genes to GO IDs...")
+gene_to_go_ids <- toTable(yeast2GO2ALLPROBES)
+
+log_info("Linking GO IDs to GO terms...")
+go_ids_to_terms <- toTable(GOTERM)
+go_ids_to_terms <- go_ids_to_terms[, c("go_id", "Term")]
+
+log_info("Performing over-representation GO analysis...")
+go_analysis <- kegga(fit_eb,
+    gene.pathway = gene_to_go_ids,
+    pathway.names = go_ids_to_terms
+    )
+log_info("Extracting top GO terms...")
+top_go_terms <- topKEGG(go_analysis)
+
 # Histogram of the adjusted p-value distribution
 # meant for QC of the test results.
 # See https://www.ncbi.nlm.nih.gov/pmc/articles/PMC6164648/ or
 # http://varianceexplained.org/statistics/interpreting-pvalue-histogram/
 
-# Normal test assumption (limma::eBayes proportion)
+# Note: normal test assumption (limma::eBayes proportion)
 # is most genes are not differentially expressed.
 if (arguments$qc) {
     if (!qc_selected || arguments$t) {
@@ -325,9 +324,7 @@ if (arguments$qc) {
         )
         invisible(dev.off())
 
-        # Filter out probes with invalid moderated F-statistics.
         good_test_probes <- which(!is.na(fit_eb$F))
-        # Quantile-Quantile plot for the moderated t-statistics.
         log_info("Generating Q-Q for the mod t-statistics...")
         pdf(file = here(
             qc_data_dir,
@@ -342,8 +339,6 @@ if (arguments$qc) {
 }
 
 if (arguments$plots) {
-    # Generate volcanoplot with the DE genes as selected from the
-    # adjusted p-value and log2 fold-change cutoff.
     ct <- 1
     log_info("Generating volcanoplot...")
     pdf(file = here(plots_dir, "volcano.pdf"))
@@ -375,8 +370,7 @@ if (arguments$plots) {
     vennDiagram(results, circle.col = palette())
     invisible(dev.off())
 
-    # Generate heatmap where genes are clustered by
-    # relative changes in expression, in order to plot the DE genes.
+    # Generate heatmap where genes are clustered by relative changes in expression.
     # To cluster together genes with similar DE patterns,
     # the genes are clustered by Pearson correlation,
     # and the log-expression values are mean-corrected by rows for the plot.
