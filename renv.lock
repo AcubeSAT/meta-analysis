@@ -243,6 +243,13 @@
       "Source": "Bioconductor",
       "Hash": "aeb1294ebb930a7b857db38bf1ce1e13"
     },
+    "arrow": {
+      "Package": "arrow",
+      "Version": "4.0.1",
+      "Source": "Repository",
+      "Repository": "CRAN",
+      "Hash": "6c1d55eba1db16126145fb75a447f031"
+    },
     "ash": {
       "Package": "ash",
       "Version": "1.0-15",

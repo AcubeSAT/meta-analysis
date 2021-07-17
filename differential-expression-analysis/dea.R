@@ -44,6 +44,7 @@ suppressWarnings(suppressPackageStartupMessages({
     library(biomaRt)
     library(logger)
     library(tibble)
+    library(arrow)
     # "suggests" dependencies; track carefully.
     library(statmod)
     library(xml2)
@@ -81,6 +82,7 @@ helpers_dir <- here("differential-expression-analysis", "helpers.R")
 
 results_dir <- here("differential-expression-analysis", "results")
 plots_dir <- here(results_dir, "plots")
+tibbles_dir <- here("differential-expression-analysis", "tibbles")
 
 log_info("Reading in CEL files...")
 cel_affybatch <- ReadAffy(filenames = list.celfiles(
@@ -100,9 +102,11 @@ probe_filter <- s_cerevisiae_mask[[1]]
 log_info("Loading helpers file...")
 source(helpers_dir)
 
-log_info("Removing Pombe probe sets...")
+log_info("Saving S.cerevisiae-only Yeast 2.0 probe sets tibble...")
 # Grab a tibble with only the S. cerevisiae data.
 s_cerevisiae_df <- extract_ids(probe_filter)
+tibble_path <- "cerevisiae-only-probesets.feather"
+arrow::write_feather(s_cerevisiae_df, here::here(tibbles_dir, tibble_path))
 
 cleancdf <- cleancdfname(cel_affybatch@cdfName)
 probe_package_name <- "yeast2probe"
@@ -110,6 +114,7 @@ probe_package_name <- "yeast2probe"
 # This is needed, since the was created using the Affymetrix Yeast Genome 2.0,
 # which also contains probe sets for Schizosaccharomyces pombe:
 # https://www.affymetrix.com/support/technical/datasheets/yeast2_datasheet.pdf
+log_info("Removing Pombe probe sets...")
 remove_probes(probe_filter, cleancdf, probe_package_name)
 
 if (arguments$qc) {
@@ -262,6 +267,9 @@ de_genes$ENTREZ <- getBM(
 )[, 2]
 
 de_genes <- as_tibble(de_genes)
+log_info("Saving DE genes tibble...")
+tibble_path <- "de-genes.feather"
+arrow::write_feather(de_genes, here::here(tibbles_dir, tibble_path))
 
 log_info("Running decideTests...")
 # Identify the significantly differentially expressed genes for each contrast.
@@ -281,6 +289,10 @@ results <- as.data.frame(results)
 # https://tibble.tidyverse.org/reference/rownames.html
 results <- rownames_to_column(results, var = "probe_id")
 results <- as_tibble(results)
+
+log_info("Saving decideTests results tibble...")
+tibble_path <- "decideTests.feather"
+arrow::write_feather(results, here::here(tibbles_dir, tibble_path))
 
 if (arguments$qc || arguments$plots) {
     full_tt <- topTable(fit_eb,
@@ -309,6 +321,10 @@ colnames(top_go_terms)[1] <- "GO Term"
 
 top_go_terms <- rownames_to_column(top_go_terms, var = "GO ID")
 top_go_terms <- as_tibble(top_go_terms)
+
+log_info("Saving kegga/goana GO terms tibble...")
+tibble_path <- "kegga-GOTerms.feather"
+arrow::write_feather(top_go_terms, here::here(tibbles_dir, tibble_path))
 
 # Histogram of the adjusted p-value distribution
 # meant for QC of the test results.
