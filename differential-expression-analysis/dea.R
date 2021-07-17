@@ -270,6 +270,11 @@ results <- decideTests(fit_eb,
     p.value = .05,
     lfc = .9
 )
+
+if (arguments$qc || arguments$plots) {
+    # Venn diagram needs TestResults-class.
+    results_dT <- results
+}
 # tibble gets all confused with the TestResults-class...
 results <- as.data.frame(results)
 # tibble also won't preserve rownames.
@@ -360,7 +365,7 @@ if (arguments$plots) {
         coef = ct,
         main = colnames(fit_eb)[ct],
         pch = 20,
-        highlight = length(which(results[, ct] != 0)),
+        highlight = length(which(results_dT[, ct] != 0)),
         names = rep("+", nrow(fit_eb))
     )
     invisible(dev.off())
@@ -371,7 +376,7 @@ if (arguments$plots) {
     pdf(file = here(plots_dir, "MD.pdf"))
     plotMD(fit_eb,
         column = ct,
-        status = results[, ct],
+        status = results_dT[, ct],
         legend = F,
         pch = 20,
         cex = 1
@@ -381,7 +386,7 @@ if (arguments$plots) {
 
     log_info("Generating Venn diagram...")
     pdf(file = here(plots_dir, "venn.pdf"))
-    vennDiagram(results, circle.col = palette())
+    vennDiagram(results_dT, circle.col = palette())
     invisible(dev.off())
 
     # Generate heatmap where genes are clustered by relative changes in expression.
@@ -390,7 +395,7 @@ if (arguments$plots) {
     # and the log-expression values are mean-corrected by rows for the plot.
     log_info("Generating heatmap...")
     pdf(file = here(plots_dir, "heatmap.pdf"))
-    coolmap(eset_final[rownames(de_genes), ],
+    coolmap(eset_final[de_genes$PROBEID ],
         labRow = de_genes$GENENAME
     )
     invisible(dev.off())
