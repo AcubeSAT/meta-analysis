@@ -3,6 +3,9 @@
 # If you can't do that, feel free to play with rprojroot:
 # https://github.com/jennybc/here_here#tldr
 
+pval_cutoff <- .05
+lfc_cutoff <- .9
+
 suppressWarnings(suppressPackageStartupMessages(library(docopt)))
 
 "DEA script for GLDS-62 GeneLab entry.
@@ -29,33 +32,38 @@ qc_selected <- any(arguments$r, arguments$n, arguments$t)
 # you can use conflicted by r-lib, loading it into session
 # and slowly working your way through the script. See more:
 # https://github.com/r-lib/conflicted
-suppressWarnings(suppressPackageStartupMessages({
-    library(dplyr)
-    library(affy)
-    library(AnnotationDbi)
-    library(arrayQualityMetrics)
-    library(here)
-    library(yeast2.db)
-    library(yeast2probe)
-    library(limma)
-    library(EnhancedVolcano)
-    library(ggplot2)
-    library(yeast2cdf)
-    library(biomaRt)
-    library(logger)
-    library(tibble)
-    library(arrow)
-    # "suggests" dependencies; track carefully.
-    library(statmod)
-    library(xml2)
-    library(gplots)
-    library(GO.db)
-}))
+suppressMessages(
+    suppressWarnings(
+        suppressPackageStartupMessages({
+            library(dplyr)
+            library(affy)
+            library(AnnotationDbi)
+            library(arrayQualityMetrics)
+            library(here)
+            library(yeast2.db)
+            library(yeast2probe)
+            library(limma)
+            library(EnhancedVolcano)
+            library(ggplot2)
+            library(yeast2cdf)
+            library(biomaRt)
+            library(logger)
+            library(tibble)
+            library(arrow)
+            library(topGO)
+            # "suggests" dependencies; track carefully.
+            library(statmod)
+            library(xml2)
+            library(gplots)
+            library(GO.db)
+        })
+    )
+)
 
-if(arguments$q) {
+if (arguments$q) {
     log_threshold(SUCCESS)
 } else {
-    if(!arguments$no_color) {
+    if (!arguments$no_color) {
         log_layout(layout_glue_colors)
     }
 }
@@ -176,7 +184,12 @@ eset_final <- subset(eset_rma, !mul_mapping_ids)
 
 # Get the feature data only for the filtered probes.
 fData(eset_final)$PROBEID <- rownames(fData(eset_final))
-fData(eset_final) <- suppressMessages(left_join(fData(eset_final), annotated_data))
+fData(eset_final) <- suppressMessages(
+    left_join(
+        fData(eset_final),
+        annotated_data
+    )
+)
 # Restore the rownames after performing the left join.
 rownames(fData(eset_final)) <- fData(eset_final)$PROBEID
 
@@ -239,8 +252,8 @@ log_info("Selecting DE genes...")
 de_genes <- topTable(fit_eb,
     adjust.method = "BH",
     sort.by = "B",
-    p.value = .05,
-    lfc = .9
+    p.value = pval_cutoff,
+    lfc = lfc_cutoff
 )
 de_genes <- subset(de_genes,
     select = c(
@@ -258,7 +271,7 @@ de_genes <- subset(de_genes,
 log_info("Adding ENTREZ IDs...")
 # Select the Affymetrix Yeast Genome 2.0 database from ensembl,
 # and submit the query for the ENTREZ IDs.
-ensembl = useMart("ensembl",dataset="scerevisiae_gene_ensembl")
+ensembl <- useMart("ensembl", dataset = "scerevisiae_gene_ensembl")
 de_genes$ENTREZ <- getBM(
     attributes = c("affy_yeast_2", "entrezgene_id"),
     filters = "affy_yeast_2",
@@ -275,8 +288,8 @@ log_info("Running decideTests...")
 # Identify the significantly differentially expressed genes for each contrast.
 results <- decideTests(fit_eb,
     adjust.method = "BH",
-    p.value = .05,
-    lfc = .9
+    p.value = pval_cutoff,
+    lfc = lfc_cutoff
 )
 
 if (arguments$qc || arguments$plots) {
@@ -294,13 +307,80 @@ log_info("Saving decideTests results tibble...")
 tibble_path <- "decideTests.feather"
 arrow::write_feather(results, here::here(tibbles_dir, tibble_path))
 
-if (arguments$qc || arguments$plots) {
-    full_tt <- topTable(fit_eb,
-        adjust.method = "BH",
-        sort.by = "B",
-        number = Inf
+full_tt <- topTable(fit_eb,
+    adjust.method = "BH",
+    sort.by = "B",
+    number = Inf
+)
+
+full_tt <- as_tibble(full_tt)
+log_info("Saving full gene list from LMF tibble...")
+tibble_path <- "full-de-genes.feather"
+arrow::write_feather(full_tt, here::here(tibbles_dir, tibble_path))
+
+log_info("Generating gene universe...")
+all_genes <- full_tt$adj.P.Val
+names(all_genes) <- full_tt$PROBEID
+
+log_info("Generating BP ID2GO mapping...")
+tmp <- toTable(yeast2GO2ALLPROBES)
+tmp_bp <- tmp[tmp$Ontology == "BP", ]
+ID2GO_bp <- split(tmp_bp$go_id, tmp_bp$probe_id)
+
+log_info("Generating MF ID2GO mapping...")
+tmp <- toTable(yeast2GO2ALLPROBES)
+tmp_mf <- tmp[tmp$Ontology == "MF", ]
+ID2GO_mf <- split(tmp_mf$go_id, tmp_mf$probe_id)
+
+log_info("Generating BP ID2GO mapping...")
+tmp <- toTable(yeast2GO2ALLPROBES)
+tmp_cc <- tmp[tmp$Ontology == "CC", ]
+ID2GO_cc <- split(tmp_cc$go_id, tmp_cc$probe_id)
+
+log_info("Generating the BP topGOdata object...")
+GOdata_bp <- suppressMessages(new(
+    "topGOdata",
+    ontology = "BP",
+    allGenes = all_genes,
+    annot = annFUN.gene2GO,
+    gene2GO = ID2GO_bp,
+    geneSel = function(x) x < pval_cutoff,
+    description = paste(
+        "BP GO analysis of DE genes with BH adjusted pval < ",
+        pval_cutoff,
+        sep = ""
     )
-}
+))
+
+log_info("Generating the MF topGOdata object...")
+GOdata_mf <- suppressMessages(new(
+    "topGOdata",
+    ontology = "MF",
+    allGenes = all_genes,
+    annot = annFUN.gene2GO,
+    gene2GO = ID2GO_mf,
+    geneSel = function(x) x < pval_cutoff,
+    description = paste(
+        "MF GO analysis of DE genes with BH adjusted pval < ",
+        pval_cutoff,
+        sep = ""
+    )
+))
+
+log_info("Generating the CC topGOdata object...")
+GOdata_cc <- suppressMessages(new(
+    "topGOdata",
+    ontology = "CC",
+    allGenes = all_genes,
+    annot = annFUN.gene2GO,
+    gene2GO = ID2GO_cc,
+    geneSel = function(x) x < pval_cutoff,
+    description = paste(
+        "CC GO analysis of DE genes with BH adjusted pval < ",
+        pval_cutoff,
+        sep = ""
+    )
+))
 
 # https://support.bioconductor.org/p/123219/#123228
 log_info("Linking genes to GO IDs...")
@@ -314,7 +394,7 @@ log_info("Performing over-representation GO analysis...")
 go_analysis <- kegga(fit_eb,
     gene.pathway = gene_to_go_ids,
     pathway.names = go_ids_to_terms
-    )
+)
 log_info("Extracting top GO terms...")
 top_go_terms <- topKEGG(go_analysis)
 colnames(top_go_terms)[1] <- "GO Term"
@@ -405,13 +485,14 @@ if (arguments$plots) {
     vennDiagram(results_dT, circle.col = palette())
     invisible(dev.off())
 
-    # Generate heatmap where genes are clustered by relative changes in expression.
+    # Generate heatmap where genes are clustered
+    # by relative changes in expression.
     # To cluster together genes with similar DE patterns,
     # the genes are clustered by Pearson correlation,
     # and the log-expression values are mean-corrected by rows for the plot.
     log_info("Generating heatmap...")
     pdf(file = here(plots_dir, "heatmap.pdf"))
-    coolmap(eset_final[de_genes$PROBEID ],
+    coolmap(eset_final[de_genes$PROBEID],
         labRow = de_genes$GENENAME
     )
     invisible(dev.off())
@@ -428,9 +509,14 @@ if (arguments$plots) {
         title = "On-ground vs Microgravity",
         subtitle = "Differential Expression",
         caption = bquote(~ Log[2] ~
-        "fold change cutoff, 0.9; p-value cutoff, 0.05"),
-        pCutoff = .05,
-        FCcutoff = .9,
+        paste("fold change cutoff, ",
+            lfc_cutoff,
+            "; p-value cutoff, ",
+            pval_cutoff,
+            sep = ""
+        )),
+        pCutoff = pval_cutoff,
+        FCcutoff = lfc_cutoff,
         pointSize = 1.2,
         labSize = 5.0,
         colAlpha = .8,

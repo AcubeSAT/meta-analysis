@@ -200,6 +200,13 @@
       "Source": "Bioconductor",
       "Hash": "a750488825efca8e08a30e8157821b9b"
     },
+    "SparseM": {
+      "Package": "SparseM",
+      "Version": "1.81",
+      "Source": "Repository",
+      "Repository": "CRAN",
+      "Hash": "2042cd9759cc89a453c4aefef0ce9aae"
+    },
     "XML": {
       "Package": "XML",
       "Version": "3.99-0.6",
@@ -575,6 +582,12 @@
       "Repository": "CRAN",
       "Hash": "e65e5d5dea4cbb9ba822dcd782b2ee1f"
     },
+    "graph": {
+      "Package": "graph",
+      "Version": "1.70.0",
+      "Source": "Bioconductor",
+      "Hash": "959c5ec255150e48b198d57ffd2d375e"
+    },
     "gridExtra": {
       "Package": "gridExtra",
       "Version": "2.3",
@@ -775,6 +788,13 @@
       "Source": "Repository",
       "Repository": "CRAN",
       "Hash": "61e4a10781dd00d7d81dd06ca9b94e95"
+    },
+    "matrixStats": {
+      "Package": "matrixStats",
+      "Version": "0.59.0",
+      "Source": "Repository",
+      "Repository": "CRAN",
+      "Hash": "45a2fee40a2f1bcad392cbe8a5f10d4f"
     },
     "memoise": {
       "Package": "memoise",
@@ -1060,6 +1080,12 @@
       "Source": "Repository",
       "Repository": "CRAN",
       "Hash": "7243004a708d06d4716717fa1ff5b2fe"
+    },
+    "topGO": {
+      "Package": "topGO",
+      "Version": "2.44.0",
+      "Source": "Bioconductor",
+      "Hash": "9e35f314b1db888ff08335b58cb93e48"
     },
     "utf8": {
       "Package": "utf8",
