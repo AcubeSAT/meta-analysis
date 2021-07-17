@@ -43,6 +43,7 @@ suppressWarnings(suppressPackageStartupMessages({
     library(yeast2cdf)
     library(biomaRt)
     library(logger)
+    library(tibble)
     # "suggests" dependencies; track carefully.
     library(statmod)
     library(xml2)
@@ -100,7 +101,7 @@ log_info("Loading helpers file...")
 source(helpers_dir)
 
 log_info("Removing Pombe probe sets...")
-# Grab a dataframe with only the S. cerevisiae data.
+# Grab a tibble with only the S. cerevisiae data.
 s_cerevisiae_df <- extract_ids(probe_filter)
 
 cleancdf <- cleancdfname(cel_affybatch@cdfName)
@@ -260,6 +261,8 @@ de_genes$ENTREZ <- getBM(
     mart = ensembl
 )[, 2]
 
+de_genes <- as_tibble(de_genes)
+
 log_info("Running decideTests...")
 # Identify the significantly differentially expressed genes for each contrast.
 results <- decideTests(fit_eb,
@@ -267,6 +270,12 @@ results <- decideTests(fit_eb,
     p.value = .05,
     lfc = .9
 )
+# tibble gets all confused with the TestResults-class...
+results <- as.data.frame(results)
+# tibble also won't preserve rownames.
+# https://tibble.tidyverse.org/reference/rownames.html
+results <- rownames_to_column(results, var = "probe_id")
+results <- as_tibble(results)
 
 if (arguments$qc || arguments$plots) {
     full_tt <- topTable(fit_eb,
@@ -276,6 +285,7 @@ if (arguments$qc || arguments$plots) {
     )
 }
 
+# https://support.bioconductor.org/p/123219/#123228
 log_info("Linking genes to GO IDs...")
 gene_to_go_ids <- toTable(yeast2GO2ALLPROBES)
 
@@ -290,6 +300,10 @@ go_analysis <- kegga(fit_eb,
     )
 log_info("Extracting top GO terms...")
 top_go_terms <- topKEGG(go_analysis)
+colnames(top_go_terms)[1] <- "GO Term"
+
+top_go_terms <- rownames_to_column(top_go_terms, var = "GO ID")
+top_go_terms <- as_tibble(top_go_terms)
 
 # Histogram of the adjusted p-value distribution
 # meant for QC of the test results.

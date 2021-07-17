@@ -8,6 +8,7 @@
 
 ## @knitr extract_ids
 extract_ids <- function(probe_filter) {
+    library(tibble)
     # probe_filter: a vector of S. cerevisiae genes
     # Get both S. pombe & S. cerevisiae ids from yeast2GENENAME library.
     require(yeast2.db)
@@ -48,9 +49,9 @@ extract_ids <- function(probe_filter) {
 
     # Set the gene name.
     c_genename <- yeast_genenames[-match(probe_filter, probes)]
-    df <- data.frame(
+    df <- tibble(
         probe = c_probe_id, transcript = c_transcript_id,
-        genename = c_genename, stringsAsFactors = FALSE
+        genename = c_genename
     )
     return(df)
 }
