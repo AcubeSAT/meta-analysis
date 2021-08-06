@@ -91,3 +91,49 @@ remove_probes <- function(list_out_probe_sets,
     assign(probepackagename, probe_env_org[-i_na, ], env = env)
     lockBinding(probepackagename, env)
 }
+
+## @knitr get_id_to_go_ontology
+get_id_to_go_ontology <- function(ontology) {
+    # ontology: string, one of BP, CC, MF; for:
+    # Biological Process, Cellular Component, Molecular Function.
+    ontologies <- c("BP", "CC", "MF")
+    stopifnot(ontology %in% ontologies)
+
+    library(BiocGenerics)
+    library(yeast2.db)
+
+    tmp <- BiocGenerics::toTable(yeast2.db::yeast2GO2ALLPROBES)
+    tmp_ontology <- tmp[tmp$Ontology == ontology, ]
+
+    id_to_go_ontology <- split(tmp_ontology$go_id, tmp_ontology$probe_id)
+    return(id_to_go_ontology)
+}
+
+## @knitr generate_topGOdata
+generate_topGOdata <- function(ontology, id_to_go, pval_cutoff) {
+    # ontology: String, one of BP, CC, MF; for:
+    # Biological Process, Cellular Component, Molecular Function.
+    # id_to_go: ID to GO mapping.
+    # pval_cutoff: Floating-point, p-value threshold used.
+    ontologies <- c("BP", "CC", "MF")
+    stopifnot(ontology %in% ontologies)
+    stopifnot(
+        !is.na(as.numeric(pval_cutoff)) && (pval_cutoff > 0 && pval_cutoff <= 1)
+    )
+
+    topGOdata <- suppressMessages(new(
+        "topGOdata",
+        ontology = ontology,
+        allGenes = all_genes,
+        annot = annFUN.gene2GO,
+        gene2GO = id_to_go,
+        geneSel = function(x) x < pval_cutoff,
+        description = paste(
+            ontology,
+            " GO analysis of DE genes with BH adjusted pval < ",
+            pval_cutoff,
+            sep = ""
+        )
+    ))
+    return(topGOdata)
+}

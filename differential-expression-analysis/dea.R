@@ -323,64 +323,22 @@ all_genes <- full_tt$adj.P.Val
 names(all_genes) <- full_tt$PROBEID
 
 log_info("Generating BP ID2GO mapping...")
-tmp <- toTable(yeast2GO2ALLPROBES)
-tmp_bp <- tmp[tmp$Ontology == "BP", ]
-ID2GO_bp <- split(tmp_bp$go_id, tmp_bp$probe_id)
+id_to_go_bp <- get_id_to_go_ontology("BP")
+
+log_info("Generating CC ID2GO mapping...")
+id_to_go_cc <- get_id_to_go_ontology("CC")
 
 log_info("Generating MF ID2GO mapping...")
-tmp <- toTable(yeast2GO2ALLPROBES)
-tmp_mf <- tmp[tmp$Ontology == "MF", ]
-ID2GO_mf <- split(tmp_mf$go_id, tmp_mf$probe_id)
-
-log_info("Generating BP ID2GO mapping...")
-tmp <- toTable(yeast2GO2ALLPROBES)
-tmp_cc <- tmp[tmp$Ontology == "CC", ]
-ID2GO_cc <- split(tmp_cc$go_id, tmp_cc$probe_id)
+id_to_go_mf <- get_id_to_go_ontology("MF")
 
 log_info("Generating the BP topGOdata object...")
-GOdata_bp <- suppressMessages(new(
-    "topGOdata",
-    ontology = "BP",
-    allGenes = all_genes,
-    annot = annFUN.gene2GO,
-    gene2GO = ID2GO_bp,
-    geneSel = function(x) x < pval_cutoff,
-    description = paste(
-        "BP GO analysis of DE genes with BH adjusted pval < ",
-        pval_cutoff,
-        sep = ""
-    )
-))
-
-log_info("Generating the MF topGOdata object...")
-GOdata_mf <- suppressMessages(new(
-    "topGOdata",
-    ontology = "MF",
-    allGenes = all_genes,
-    annot = annFUN.gene2GO,
-    gene2GO = ID2GO_mf,
-    geneSel = function(x) x < pval_cutoff,
-    description = paste(
-        "MF GO analysis of DE genes with BH adjusted pval < ",
-        pval_cutoff,
-        sep = ""
-    )
-))
+GOdata_bp <- generate_topGOdata("BP", id_to_go_bp, pval_cutoff)
 
 log_info("Generating the CC topGOdata object...")
-GOdata_cc <- suppressMessages(new(
-    "topGOdata",
-    ontology = "CC",
-    allGenes = all_genes,
-    annot = annFUN.gene2GO,
-    gene2GO = ID2GO_cc,
-    geneSel = function(x) x < pval_cutoff,
-    description = paste(
-        "CC GO analysis of DE genes with BH adjusted pval < ",
-        pval_cutoff,
-        sep = ""
-    )
-))
+GOdata_cc <- generate_topGOdata("CC", id_to_go_cc, pval_cutoff)
+
+log_info("Generating the MF topGOdata object...")
+GOdata_mf <- generate_topGOdata("MF", id_to_go_mf, pval_cutoff)
 
 # https://support.bioconductor.org/p/123219/#123228
 log_info("Linking genes to GO IDs...")
