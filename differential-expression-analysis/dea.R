@@ -332,13 +332,83 @@ log_info("Generating MF ID2GO mapping...")
 id_to_go_mf <- get_id_to_go_ontology("MF")
 
 log_info("Generating the BP topGOdata object...")
-GOdata_bp <- generate_topGOdata("BP", id_to_go_bp, pval_cutoff)
+GOdata_bp <- generate_topGOdata("BP", all_genes, id_to_go_bp, pval_cutoff)
 
 log_info("Generating the CC topGOdata object...")
-GOdata_cc <- generate_topGOdata("CC", id_to_go_cc, pval_cutoff)
+GOdata_cc <- generate_topGOdata("CC", all_genes, id_to_go_cc, pval_cutoff)
 
 log_info("Generating the MF topGOdata object...")
-GOdata_mf <- generate_topGOdata("MF", id_to_go_mf, pval_cutoff)
+GOdata_mf <- generate_topGOdata("MF", all_genes, id_to_go_mf, pval_cutoff)
+
+# NOT adjusted p-values (topGO.pdf, 3.3 Analysis of Results)
+# "The p-values computed by the runTest function are unadjusted for multiple
+# testing. We do not advocate against adjusting the p-values of the tested
+# groups, however in many cases adjusted p-values might be misleading."
+log_info("Running BP Fisher GSEA test...")
+fisher_bp <- suppressMessages(
+    runTest(GOdata_bp, algorithm = "classic", statistic = "fisher")
+)
+log_info("Running BP Kolmogorov-Smirnov GSEA tests...")
+ks_bp <- suppressMessages(
+    runTest(GOdata_bp, algorithm = "classic", statistic = "ks")
+)
+elim_ks_bp <- suppressMessages(
+    runTest(GOdata_bp, algorithm = "elim", statistic = "ks")
+)
+
+log_info("Running CC Fisher GSEA test...")
+fisher_cc <- suppressMessages(
+    runTest(GOdata_cc, algorithm = "classic", statistic = "fisher")
+)
+log_info("Running CC Kolmogorov-Smirnov GSEA tests...")
+ks_cc <- suppressMessages(
+    runTest(GOdata_cc, algorithm = "classic", statistic = "ks")
+)
+elim_ks_cc <- suppressMessages(
+    runTest(GOdata_cc, algorithm = "elim", statistic = "ks")
+)
+
+log_info("Running MF Fisher GSEA test...")
+fisher_mf <- suppressMessages(
+    runTest(GOdata_mf, algorithm = "classic", statistic = "fisher")
+)
+log_info("Running MF Kolmogorov-Smirnov GSEA tests...")
+ks_mf <- suppressMessages(
+    runTest(GOdata_mf, algorithm = "classic", statistic = "ks")
+)
+elim_ks_mf <- suppressMessages(
+    runTest(GOdata_mf, algorithm = "elim", statistic = "ks")
+)
+
+log_info("Gathering BP GSEA results...")
+bp_results <- GenTable(GOdata_bp,
+    classicFisher = fisher_bp,
+    classicKS = ks_bp,
+    elimKS = elim_ks_bp,
+    orderBy = "elimKS",
+    ranksOf = "classicFisher",
+    topNodes = 10
+)
+
+log_info("Gathering CC GSEA results...")
+cc_results <- GenTable(GOdata_cc,
+    classicFisher = fisher_cc,
+    classicKS = ks_cc,
+    elimKS = elim_ks_cc,
+    orderBy = "elimKS",
+    ranksOf = "classicFisher",
+    topNodes = 10
+)
+
+log_info("Gathering MF GSEA results...")
+mf_results <- GenTable(GOdata_mf,
+    classicFisher = fisher_mf,
+    classicKS = ks_mf,
+    elimKS = elim_ks_mf,
+    orderBy = "elimKS",
+    ranksOf = "classicFisher",
+    topNodes = 10
+)
 
 # https://support.bioconductor.org/p/123219/#123228
 log_info("Linking genes to GO IDs...")

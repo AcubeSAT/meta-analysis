@@ -110,9 +110,10 @@ get_id_to_go_ontology <- function(ontology) {
 }
 
 ## @knitr generate_topGOdata
-generate_topGOdata <- function(ontology, id_to_go, pval_cutoff) {
+generate_topGOdata <- function(ontology, all_genes, id_to_go, pval_cutoff) {
     # ontology: String, one of BP, CC, MF; for:
     # Biological Process, Cellular Component, Molecular Function.
+    # all_genes: Gene universe.
     # id_to_go: ID to GO mapping.
     # pval_cutoff: Floating-point, p-value threshold used.
     ontologies <- c("BP", "CC", "MF")
