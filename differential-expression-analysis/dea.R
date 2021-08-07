@@ -412,6 +412,21 @@ mf_results <- GenTable(GOdata_mf,
     topNodes = 10
 )
 
+bp_results <- as_tibble(bp_results)
+log_info("Saving GSEA BP tibble...")
+tibble_path <- "gsea_bp.feather"
+arrow::write_feather(bp_results, here::here(tibbles_dir, tibble_path))
+
+cc_results <- as_tibble(cc_results)
+log_info("Saving GSEA CC tibble...")
+tibble_path <- "gsea_cc.feather"
+arrow::write_feather(cc_results, here::here(tibbles_dir, tibble_path))
+
+mf_results <- as_tibble(mf_results)
+log_info("Saving GSEA MF tibble...")
+tibble_path <- "gsea_mf.feather"
+arrow::write_feather(mf_results, here::here(tibbles_dir, tibble_path))
+
 if (arguments$plots) {
     log_info("Generating Fisher BP GSEA graph...")
     plot_gsea(
