@@ -138,3 +138,20 @@ generate_topGOdata <- function(ontology, all_genes, id_to_go, pval_cutoff) {
     ))
     return(topGOdata)
 }
+
+## @knitr plot_gsea
+plot_gsea <- function(GOdata, pvalues, num_sig_nodes, path, filename) {
+    # GOdata: an object of class topGOdata.
+    # pvalues: named vector of p-values.
+    # path: directory path to save plot.
+    # filename: filename to save plot as.
+    library(here)
+    library(topGO)
+    pdf(file = here::here(path, filename))
+    showSigOfNodes(GOdata,
+        pvalues,
+        firstSigNodes = num_sig_nodes,
+        useInfo = "all"
+    )
+    invisible(dev.off())
+}

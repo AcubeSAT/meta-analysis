@@ -51,11 +51,12 @@ suppressMessages(
             library(tibble)
             library(arrow)
             library(topGO)
-            # "suggests" dependencies; track carefully.
+            # "suggests" (implicit) dependencies; track carefully.
             library(statmod)
             library(xml2)
             library(gplots)
             library(GO.db)
+            library(Rgraphviz)
         })
     )
 )
@@ -90,6 +91,7 @@ helpers_dir <- here("differential-expression-analysis", "helpers.R")
 
 results_dir <- here("differential-expression-analysis", "results")
 plots_dir <- here(results_dir, "plots")
+gsea_dir <- here(results_dir, "GSEA")
 tibbles_dir <- here("differential-expression-analysis", "tibbles")
 
 log_info("Reading in CEL files...")
@@ -409,6 +411,89 @@ mf_results <- GenTable(GOdata_mf,
     ranksOf = "classicFisher",
     topNodes = 10
 )
+
+if (arguments$plots) {
+    log_info("Generating Fisher BP GSEA graph...")
+    plot_gsea(
+        GOdata_bp,
+        score(fisher_bp),
+        5,
+        gsea_dir,
+        "fisher_bp.pdf"
+    )
+
+    log_info("Generating KS BP GSEA graph...")
+    plot_gsea(
+        GOdata_bp,
+        score(ks_bp),
+        5,
+        gsea_dir,
+        "ks_bp.pdf"
+    )
+
+    log_info("Generating Elimination KS BP GSEA graph...")
+    plot_gsea(
+        GOdata_bp,
+        score(elim_ks_bp),
+        5,
+        gsea_dir,
+        "elim_ks_bp.pdf"
+    )
+
+    log_info("Generating Fisher CC GSEA graph...")
+    plot_gsea(
+        GOdata_cc,
+        score(fisher_cc),
+        5,
+        gsea_dir,
+        "fisher_cc.pdf"
+    )
+
+    log_info("Generating KS CC GSEA graph...")
+    plot_gsea(
+        GOdata_cc,
+        score(ks_cc),
+        5,
+        gsea_dir,
+        "ks_cc.pdf"
+    )
+
+    log_info("Generating Elimination KS CC GSEA graph...")
+    plot_gsea(
+        GOdata_cc,
+        score(elim_ks_cc),
+        5,
+        gsea_dir,
+        "elim_ks_cc.pdf"
+    )
+
+    log_info("Generating Fisher MF GSEA graph...")
+    plot_gsea(
+        GOdata_mf,
+        score(fisher_mf),
+        5,
+        gsea_dir,
+        "fisher_mf.pdf"
+    )
+
+    log_info("Generating KS MF GSEA graph...")
+    plot_gsea(
+        GOdata_mf,
+        score(ks_mf),
+        5,
+        gsea_dir,
+        "ks_mf.pdf"
+    )
+
+    log_info("Generating Elimination KS MF GSEA graph...")
+    plot_gsea(
+        GOdata_mf,
+        score(elim_ks_mf),
+        5,
+        gsea_dir,
+        "elim_ks_mf.pdf"
+    )
+}
 
 # https://support.bioconductor.org/p/123219/#123228
 log_info("Linking genes to GO IDs...")
