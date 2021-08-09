@@ -4,12 +4,22 @@ tic()
 library(logger)
 
 log_info("Importing libraries...")
-
-library(GEOquery)
-library(limma)
-library(umap)
-# implicit dependencies
-library(statmod)
+# Import order matters for masking, take care.
+# To identify conflicts used by ambiguous function names,
+# you can use conflicted by r-lib, loading it into session
+# and slowly working your way through the script. See more:
+# https://github.com/r-lib/conflicted
+suppressMessages(
+    suppressWarnings(
+        suppressPackageStartupMessages({
+            library(GEOquery)
+            library(limma)
+            library(umap)
+            # "suggests" (implicit) dependencies; track carefully.
+            library(statmod)
+        })
+    )
+)
 
 log_info("Loading data from GEO...")
 gset <- getGEO("GSE4136", GSEMatrix = TRUE, AnnotGPL = TRUE)
