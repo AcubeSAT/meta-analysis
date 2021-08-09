@@ -1,3 +1,6 @@
+library(tictoc)
+tic()
+
 library(logger)
 
 log_info("Importing libraries...")
@@ -77,7 +80,9 @@ results <- decideTests(fit_eb,
     lfc = 2
 )
 
-log_success("The script finished running successfully!")
+toc(quiet = TRUE, log = TRUE)
+t <- tic.log()
+log_success("The script finished running successfully! Time: {t}")
 # ct <- 1
 # volcanoplot(fit_eb,
 #     coef = ct,
