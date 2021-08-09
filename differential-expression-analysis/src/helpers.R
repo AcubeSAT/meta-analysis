@@ -12,7 +12,7 @@ extract_ids <- function(annotation_data_dir, probe_filter) {
     # probe_filter: a vector of S. cerevisiae genes
     # Get both S. pombe & S. cerevisiae ids from yeast2GENENAME library.
     require(yeast2.db)
-    genenames <- as.list(yeast2GENENAME)
+    genenames <- as.list(yeast2.db::yeast2GENENAME)
     probes <- names(genenames)
 
     # Get all transcript ids from yeast2annotation.csv.
@@ -69,8 +69,9 @@ remove_probes <- function(list_out_probe_sets,
     # (idea originally from gcrma compute.affinities.R)
     tmp <- get("xy2indices", paste("package:", cdfpackagename, sep = ""))
 
+    # cleancdf is from cdfpackagename... I think.
     new_affybatch <- new("AffyBatch", cdfName = cleancdf)
-    pm_index <- unlist(indexProbes(new_affybatch, "pm"))
+    pm_index <- unlist(affy::indexProbes(new_affybatch, "pm"))
     sub_index <- match(tmp(probe_env_org$x, probe_env_org$y,
         cdf = cdfpackagename
     ), pm_index)
