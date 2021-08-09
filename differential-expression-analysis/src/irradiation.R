@@ -8,7 +8,7 @@ suppressWarnings(suppressPackageStartupMessages(library(docopt)))
 "DEA script for GSE4136 GEO entry (processed data).
 
 Usage:
-  irradiation.R
+  irradiation.R [-q | --no-color]
   irradiation.R (-h | --help)
   irradiation.R --version
 
@@ -23,6 +23,14 @@ library(tictoc)
 tic()
 
 library(logger)
+
+if (arguments$q) {
+    log_threshold(SUCCESS)
+} else {
+    if (!arguments$no_color) {
+        log_layout(layout_glue_colors)
+    }
+}
 
 log_info("Importing libraries...")
 # Import order matters for masking, take care.
