@@ -88,6 +88,12 @@
       "Repository": "CRAN",
       "Hash": "cc8c8c4d61346cde1ca60030ff9c241f"
     },
+    "GEOquery": {
+      "Package": "GEOquery",
+      "Version": "2.60.0",
+      "Source": "Bioconductor",
+      "Hash": "4faad18e6e1f436efecd43a6fc4bbd08"
+    },
     "GO.db": {
       "Package": "GO.db",
       "Version": "3.13.0",
@@ -180,12 +186,26 @@
       "Repository": "CRAN",
       "Hash": "71f19d00a7736b24492fb26b483bc450"
     },
+    "RSpectra": {
+      "Package": "RSpectra",
+      "Version": "0.16-0",
+      "Source": "Repository",
+      "Repository": "CRAN",
+      "Hash": "a41329d24d5a98eaed2bd0159adb1b5f"
+    },
     "Rcpp": {
       "Package": "Rcpp",
       "Version": "1.0.6",
       "Source": "Repository",
       "Repository": "CRAN",
       "Hash": "dbb5e436998a7eba5a9d682060533338"
+    },
+    "RcppEigen": {
+      "Package": "RcppEigen",
+      "Version": "0.3.3.9.1",
+      "Source": "Repository",
+      "Repository": "CRAN",
+      "Hash": "ddfa72a87fdf4c80466a20818be91d00"
     },
     "Rgraphviz": {
       "Package": "Rgraphviz",
@@ -379,6 +399,13 @@
       "Source": "Repository",
       "Repository": "CRAN",
       "Hash": "a94ba44cee3ea571e813721e64184172"
+    },
+    "clipr": {
+      "Package": "clipr",
+      "Version": "0.7.1",
+      "Source": "Repository",
+      "Repository": "CRAN",
+      "Hash": "ebaa97ac99cc2daf04e77eecc7b781d7"
     },
     "cluster": {
       "Package": "cluster",
@@ -954,6 +981,13 @@
       "Repository": "CRAN",
       "Hash": "5e3c5dc0b071b21fa128676560dbe94d"
     },
+    "readr": {
+      "Package": "readr",
+      "Version": "2.0.0",
+      "Source": "Repository",
+      "Repository": "CRAN",
+      "Hash": "849038f0839134ab35e719a9820005a6"
+    },
     "renv": {
       "Package": "renv",
       "Version": "0.13.2",
@@ -967,6 +1001,13 @@
       "Source": "Repository",
       "Repository": "CRAN",
       "Hash": "bb5996d0bd962d214a11140d77589917"
+    },
+    "reticulate": {
+      "Package": "reticulate",
+      "Version": "1.20",
+      "Source": "Repository",
+      "Repository": "CRAN",
+      "Hash": "30ab0ea8c8d3dd16a3fa06903449bbfb"
     },
     "rlang": {
       "Package": "rlang",
@@ -1100,6 +1141,20 @@
       "Source": "Bioconductor",
       "Hash": "9e35f314b1db888ff08335b58cb93e48"
     },
+    "tzdb": {
+      "Package": "tzdb",
+      "Version": "0.1.2",
+      "Source": "Repository",
+      "Repository": "CRAN",
+      "Hash": "fb2b801053decce71295bb8cb04d438b"
+    },
+    "umap": {
+      "Package": "umap",
+      "Version": "0.2.7.0",
+      "Source": "Repository",
+      "Repository": "CRAN",
+      "Hash": "4c6d6bac2aef2998ce382d05de14f427"
+    },
     "utf8": {
       "Package": "utf8",
       "Version": "1.2.1",
@@ -1134,6 +1189,13 @@
       "Source": "Repository",
       "Repository": "CRAN",
       "Hash": "55e157e2aa88161bdb0754218470d204"
+    },
+    "vroom": {
+      "Package": "vroom",
+      "Version": "1.5.4",
+      "Source": "Repository",
+      "Repository": "CRAN",
+      "Hash": "1a23013f39e67bb57cbda6f4ddde5470"
     },
     "vsn": {
       "Package": "vsn",
