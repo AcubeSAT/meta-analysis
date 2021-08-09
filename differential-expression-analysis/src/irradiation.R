@@ -64,7 +64,8 @@ log_info("Loading helpers file...")
 source(helpers_dir)
 
 log_info("Loading data from GEO...")
-gset <- suppressMessages(getGEO("GSE4136", GSEMatrix = TRUE, AnnotGPL = TRUE))
+# Why doesn't getGEO call download.file with quiet = TRUE?
+gset <- suppressMessages(quiet(getGEO("GSE4136", GSEMatrix = TRUE, AnnotGPL = TRUE)))
 gset <- gset[[1]]
 
 # make proper column names to match toptable

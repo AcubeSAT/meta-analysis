@@ -1,3 +1,12 @@
+# Taken from http://web.archive.org/web/20190109043848/http://r.789695.n4.nabble.com/Suppressing-output-e-g-from-cat-td859876.html
+
+## @knitr quiet
+quiet <- function(x) { 
+  sink(tempfile()) 
+  on.exit(sink()) 
+  invisible(force(x)) 
+}
+
 # Taken from https://github.com/csgillespie/bmc-microarray
 # As mentioned in:
 # Gillespie, C. S., Lei, G., Boys,
