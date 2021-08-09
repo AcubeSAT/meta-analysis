@@ -27,6 +27,17 @@ Options:
 arguments <- docopt(doc, version = "flocculation 0.1")
 qc_selected <- any(arguments$r, arguments$n, arguments$t)
 
+library(logger)
+
+if (arguments$q) {
+    log_threshold(SUCCESS)
+} else {
+    if (!arguments$no_color) {
+        log_layout(layout_glue_colors)
+    }
+}
+
+log_info("Importing libraries...")
 # Import order matters for masking, take care.
 # To identify conflicts used by ambiguous function names,
 # you can use conflicted by r-lib, loading it into session
@@ -47,7 +58,7 @@ suppressMessages(
             library(ggplot2)
             library(yeast2cdf)
             library(biomaRt)
-            library(logger)
+            # library(logger)
             library(tibble)
             library(arrow)
             library(topGO)
@@ -60,14 +71,6 @@ suppressMessages(
         })
     )
 )
-
-if (arguments$q) {
-    log_threshold(SUCCESS)
-} else {
-    if (!arguments$no_color) {
-        log_layout(layout_glue_colors)
-    }
-}
 
 log_info("Setting up paths...")
 # Dataset taken from the GeneLab platform entry:
