@@ -29,8 +29,8 @@ Options:
 " -> doc
 arguments <- docopt(doc, version = "flocculation 0.1")
 
-library(tictoc)
 if (arguments$time) {
+    library(tictoc)
     tic()
 }
 

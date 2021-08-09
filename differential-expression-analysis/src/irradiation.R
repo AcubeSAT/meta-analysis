@@ -8,7 +8,7 @@ suppressWarnings(suppressPackageStartupMessages(library(docopt)))
 "DEA script for GSE4136 GEO entry (processed data).
 
 Usage:
-  irradiation.R [-q | --no-color]
+  irradiation.R [-q | --no-color] [--time]
   irradiation.R (-h | --help)
   irradiation.R --version
 
@@ -19,8 +19,10 @@ Options:
 " -> doc
 arguments <- docopt(doc, version = "irradiation 0.1")
 
-library(tictoc)
-tic()
+if (arguments$time) {
+    library(tictoc)
+    tic()
+}
 
 library(logger)
 
@@ -119,9 +121,14 @@ results <- decideTests(fit_eb,
     lfc = 2
 )
 
-toc(quiet = TRUE, log = TRUE)
-t <- tic.log()
-log_success("The script finished running successfully! Time: {t}")
+if (arguments$time) {
+    toc(quiet = TRUE, log = TRUE)
+    t <- tic.log()
+    log_success("The script finished running successfully! Time: {t}")
+} else {
+    log_success("The script finished running successfully!")
+}
+
 # ct <- 1
 # volcanoplot(fit_eb,
 #     coef = ct,
