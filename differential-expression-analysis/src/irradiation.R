@@ -46,14 +46,25 @@ suppressMessages(
             library(GEOquery)
             library(limma)
             library(umap)
+            library(here)
             # "suggests" (implicit) dependencies; track carefully.
             library(statmod)
         })
     )
 )
 
+log_info("Setting up paths...")
+helpers_dir <- here(
+    "differential-expression-analysis",
+    "src",
+    "helpers.R"
+)
+
+log_info("Loading helpers file...")
+source(helpers_dir)
+
 log_info("Loading data from GEO...")
-gset <- getGEO("GSE4136", GSEMatrix = TRUE, AnnotGPL = TRUE)
+gset <- suppressMessages(getGEO("GSE4136", GSEMatrix = TRUE, AnnotGPL = TRUE))
 gset <- gset[[1]]
 
 # make proper column names to match toptable
