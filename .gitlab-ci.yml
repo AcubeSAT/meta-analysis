@@ -4,4 +4,4 @@ after_script:
 run:
   image: xlxs4/meta-analysis:latest
   script:
-      - Rscript differential-expression-analysis/dea.R --qc --plots
+      - Rscript differential-expression-analysis/src/flocculation.R --qc --plots
