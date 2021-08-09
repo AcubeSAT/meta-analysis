@@ -14,14 +14,16 @@ Usage:
   flocculation.R [-q | --no-color]
   flocculation.R (-h | --help)
   flocculation.R --version
-  flocculation.R --qc [-r] [-n] [-t] [--plots] [-q | --no-color]
-  flocculation.R --plots [-q | --no-color]
+  flocculation.R --qc [-r] [-n] [-t] [--plots] [-q | --no-color] [--feather]
+  flocculation.R --plots [-q | --no-color] [--feather]
+  flocculation.R --feather
 
 Options:
   -h --help     Show this screen.
   --version     Show version.
   --qc          Produce QC reports.
   --plots       Produce DEA plots.
+  --feather     Save result tibbles as (arrow) feather files.
 
 " -> doc
 arguments <- docopt(doc, version = "flocculation 0.1")
@@ -140,11 +142,14 @@ probe_filter <- s_cerevisiae_mask[[1]]
 log_info("Loading helpers file...")
 source(helpers_dir)
 
-log_info("Saving S.cerevisiae-only Yeast 2.0 probe sets tibble...")
 # Grab a tibble with only the S. cerevisiae data.
 s_cerevisiae_df <- extract_ids(annotation_data_dir, probe_filter)
-tibble_path <- "cerevisiae-only-probesets.feather"
-arrow::write_feather(s_cerevisiae_df, here::here(tibbles_dir, tibble_path))
+
+if (arguments$feather) {
+    log_info("Saving S.cerevisiae-only Yeast 2.0 probe sets tibble...")
+    tibble_path <- "cerevisiae-only-probesets.feather"
+    arrow::write_feather(s_cerevisiae_df, here::here(tibbles_dir, tibble_path))
+}
 
 cleancdf <- cleancdfname(cel_affybatch@cdfName)
 probe_package_name <- "yeast2probe"
@@ -310,9 +315,12 @@ de_genes$ENTREZ <- getBM(
 )[, 2]
 
 de_genes <- as_tibble(de_genes)
-log_info("Saving DE genes tibble...")
-tibble_path <- "de-genes.feather"
-arrow::write_feather(de_genes, here::here(tibbles_dir, tibble_path))
+
+if (arguments$feather) {
+    log_info("Saving DE genes tibble...")
+    tibble_path <- "de-genes.feather"
+    arrow::write_feather(de_genes, here::here(tibbles_dir, tibble_path))
+}
 
 log_info("Running decideTests...")
 # Identify the significantly differentially expressed genes for each contrast.
@@ -333,9 +341,11 @@ results <- as.data.frame(results)
 results <- rownames_to_column(results, var = "probe_id")
 results <- as_tibble(results)
 
-log_info("Saving decideTests results tibble...")
-tibble_path <- "decideTests.feather"
-arrow::write_feather(results, here::here(tibbles_dir, tibble_path))
+if (arguments$feather) {
+    log_info("Saving decideTests results tibble...")
+    tibble_path <- "decideTests.feather"
+    arrow::write_feather(results, here::here(tibbles_dir, tibble_path))
+}
 
 full_tt <- topTable(fit_eb,
     adjust.method = "BH",
@@ -344,9 +354,12 @@ full_tt <- topTable(fit_eb,
 )
 
 full_tt <- as_tibble(full_tt)
-log_info("Saving full gene list from LMF tibble...")
-tibble_path <- "full-de-genes.feather"
-arrow::write_feather(full_tt, here::here(tibbles_dir, tibble_path))
+
+if (arguments$feather) {
+    log_info("Saving full gene list from LMF tibble...")
+    tibble_path <- "full-de-genes.feather"
+    arrow::write_feather(full_tt, here::here(tibbles_dir, tibble_path))
+}
 
 log_info("Generating gene universe...")
 all_genes <- full_tt$adj.P.Val
@@ -441,19 +454,28 @@ mf_results <- GenTable(GOdata_mf,
 )
 
 bp_results <- as_tibble(bp_results)
-log_info("Saving GSEA BP tibble...")
-tibble_path <- "gsea_bp.feather"
-arrow::write_feather(bp_results, here::here(tibbles_dir, tibble_path))
+
+if (arguments$feather) {
+    log_info("Saving GSEA BP tibble...")
+    tibble_path <- "gsea_bp.feather"
+    arrow::write_feather(bp_results, here::here(tibbles_dir, tibble_path))
+}
 
 cc_results <- as_tibble(cc_results)
-log_info("Saving GSEA CC tibble...")
-tibble_path <- "gsea_cc.feather"
-arrow::write_feather(cc_results, here::here(tibbles_dir, tibble_path))
+
+if (arguments$feather) {
+    log_info("Saving GSEA CC tibble...")
+    tibble_path <- "gsea_cc.feather"
+    arrow::write_feather(cc_results, here::here(tibbles_dir, tibble_path))
+}
 
 mf_results <- as_tibble(mf_results)
-log_info("Saving GSEA MF tibble...")
-tibble_path <- "gsea_mf.feather"
-arrow::write_feather(mf_results, here::here(tibbles_dir, tibble_path))
+
+if (arguments$feather) {
+    log_info("Saving GSEA MF tibble...")
+    tibble_path <- "gsea_mf.feather"
+    arrow::write_feather(mf_results, here::here(tibbles_dir, tibble_path))
+}
 
 if (arguments$plots) {
     log_info("Generating Fisher BP GSEA graph...")
@@ -558,9 +580,11 @@ colnames(top_go_terms)[1] <- "GO Term"
 top_go_terms <- rownames_to_column(top_go_terms, var = "GO ID")
 top_go_terms <- as_tibble(top_go_terms)
 
-log_info("Saving kegga/goana GO terms tibble...")
-tibble_path <- "kegga-GOTerms.feather"
-arrow::write_feather(top_go_terms, here::here(tibbles_dir, tibble_path))
+if (arguments$feather) {
+    log_info("Saving kegga/goana GO terms tibble...")
+    tibble_path <- "kegga-GOTerms.feather"
+    arrow::write_feather(top_go_terms, here::here(tibbles_dir, tibble_path))
+}
 
 # Histogram of the adjusted p-value distribution
 # meant for QC of the test results.
