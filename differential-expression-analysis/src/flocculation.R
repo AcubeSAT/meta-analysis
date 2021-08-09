@@ -11,12 +11,12 @@ suppressWarnings(suppressPackageStartupMessages(library(docopt)))
 "DEA script for GLDS-62 GeneLab entry (raw data).
 
 Usage:
-  flocculation.R [-q | --no-color]
+  flocculation.R [-q | --no-color] [--time]
   flocculation.R (-h | --help)
   flocculation.R --version
-  flocculation.R --qc [-r] [-n] [-t] [--plots] [-q | --no-color] [--feather]
-  flocculation.R --plots [-q | --no-color] [--feather]
-  flocculation.R --feather
+  flocculation.R --qc [-r] [-n] [-t] [--plots] [-q | --no-color] [--feather] [--time]
+  flocculation.R --plots [-q | --no-color] [--feather] [--time]
+  flocculation.R --feather [--time]
 
 Options:
   -h --help     Show this screen.
@@ -24,9 +24,16 @@ Options:
   --qc          Produce QC reports.
   --plots       Produce DEA plots.
   --feather     Save result tibbles as (arrow) feather files.
+  --time        Output script execution time.
 
 " -> doc
 arguments <- docopt(doc, version = "flocculation 0.1")
+
+library(tictoc)
+if (arguments$time) {
+    tic()
+}
+
 qc_selected <- any(arguments$r, arguments$n, arguments$t)
 
 library(logger)
@@ -735,4 +742,10 @@ if (arguments$plots) {
     invisible(dev.off())
 }
 
-log_success("The script finished running successfully!")
+if (arguments$time) {
+    toc(quiet = TRUE, log = TRUE)
+    t <- tic.log()
+    log_success("The script finished running successfully! Time: {t}")
+} else {
+    log_success("The script finished running successfully!")
+}
