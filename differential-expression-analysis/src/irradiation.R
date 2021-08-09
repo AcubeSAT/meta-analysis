@@ -1,3 +1,24 @@
+# Make sure to launch the R process from the
+# project top-level directory for here() to work.
+# If you can't do that, feel free to play with rprojroot:
+# https://github.com/jennybc/here_here#tldr
+
+suppressWarnings(suppressPackageStartupMessages(library(docopt)))
+
+"DEA script for GSE4136 GEO entry (processed data).
+
+Usage:
+  irradiation.R
+  irradiation.R (-h | --help)
+  irradiation.R --version
+
+Options:
+  -h --help     Show this screen.
+  --version     Show version.
+
+" -> doc
+arguments <- docopt(doc, version = "irradiation 0.1")
+
 library(tictoc)
 tic()
 
