@@ -166,6 +166,10 @@ probe_package_name <- "yeast2probe"
 log_info("Removing Pombe probe sets...")
 remove_probes(probe_filter, cleancdf, probe_package_name)
 
+# TODO: MAS5call detection could help
+# calls <- exprs(mas5calls(cel_affybatch))
+# calls %>% .[.!="P"]
+
 if (arguments$qc) {
     if (!qc_selected || arguments$r) {
         log_info("Generating QC report for raw data...")
