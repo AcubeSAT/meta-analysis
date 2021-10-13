@@ -5,4 +5,3 @@ run:
   image: xlxs4/meta-analysis:latest
   script:
       - Rscript differential-expression-analysis/src/flocculation.R --qc --plots --feather
-      - Rscript differential-expression-analysis/src/irradiation.R
