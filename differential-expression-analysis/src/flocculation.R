@@ -67,7 +67,6 @@ suppressMessages(
             library(ggplot2)
             library(yeast2cdf)
             library(biomaRt)
-            # library(logger)
             library(tibble)
             library(arrow)
             library(topGO)
@@ -214,15 +213,23 @@ annotated_data <- suppressMessages(AnnotationDbi::select(
     keytype = "PROBEID"
 ))
 
-log_info("Removing multiple-mapping probe sets...")
+# TODO: Select representative probes.
+# https://www.biostars.org/p/47421/
+
+# NOTE: PROBEID corresponds to probeset, not probe:
+# https://www.reddit.com/r/bioinformatics/comments/544zqi/comment/d7zpcxj/?utm_source=share&utm_medium=web2x&context=3
+# https://www.affymetrix.com/support/help/faqs/mouse_430/faq_8.affx
+
 # Grab transcript-cluster identifiers that map to multiple gene identifiers.
+eset_final <- eset_rma
 annotated_mul_mapping <- annotated_data %>%
     group_by(PROBEID) %>%
     summarize(no_of_matches = n_distinct(ENSEMBL)) %>%
     dplyr::filter(no_of_matches > 1)
 
 mul_mapping_ids <- (featureNames(eset_rma) %in% annotated_mul_mapping$PROBEID)
-eset_final <- subset(eset_rma, !mul_mapping_ids)
+
+eset_final <- eset_rma
 
 # Get the feature data only for the filtered probes.
 fData(eset_final)$PROBEID <- rownames(fData(eset_final))
@@ -292,6 +299,7 @@ log_info("Selecting DE genes...")
 # Grab DE genes with a FDR (Benjamini-Hochberg adjusted p-values),
 # as well as with a absolute log2 fold-change cutoff.
 de_genes <- topTable(fit_eb,
+    number = 30,
     adjust.method = "BH",
     sort.by = "B",
     p.value = pval_cutoff,
