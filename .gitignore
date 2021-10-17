@@ -3,6 +3,9 @@
 .Rhistory
 .Rapp.history
 
+# Options and environment variables
+.Rprofile
+
 # Session Data files
 .RData
 
@@ -52,3 +55,8 @@ po/*~
 # Out-of-the-box running gitlab-runner locally
 # https://github.com/firecow/gitlab-ci-local
 .gitlab-ci-local/
+
+# https://github.com/rstudio/renv/issues/74
+renv/
+
+doc
