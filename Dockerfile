@@ -6,6 +6,7 @@ FROM ubuntu:20.04
 ENV DEBIAN_FRONTEND=noninteractive
 # Dependencies for the R packages.
 RUN apt-get update && apt-get install -y --no-install-recommends \
+libbz2-dev \
 libcairo2-dev \
 libcurl4-openssl-dev \
 libfreetype6-dev \
