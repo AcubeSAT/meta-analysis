@@ -70,12 +70,14 @@ suppressMessages(
             library(tibble)
             library(arrow)
             library(topGO)
+            library(affycoretools)
             # "suggests" (implicit) dependencies; track carefully.
             library(statmod)
             library(xml2)
             library(gplots)
             library(GO.db)
             library(Rgraphviz)
+            library(Rsamtools)
         })
     )
 )
@@ -201,50 +203,33 @@ if (arguments$qc) {
     }
 }
 
-# Note there is no need to filter low-expressed genes.
-# There is no median intensity below 4, a common threshold.
+log_info("Annotating the expressionset...")
+eset_final <- suppressMessages(annotateEset(eset_rma, yeast2.db, columns = c("PROBEID", "ENSEMBL", "GENENAME")))
 
 # Adapted from maEndtoEnd
 # http://bioconductor.org/packages/devel/workflows/html/maEndToEnd.html
 # An end to end workflow for differential gene expression
 # using Affymetrix microarrays
 
-log_info("Annotating the expressionset...")
-annotated_data <- suppressMessages(AnnotationDbi::select(
-    yeast2.db,
-    keys = featureNames(eset_rma),
-    columns = c("PROBEID", "ENSEMBL", "GENENAME"),
-    keytype = "PROBEID"
-))
-
-# TODO: Select representative probes.
-# https://www.biostars.org/p/47421/
-
-# NOTE: PROBEID corresponds to probeset, not probe:
-# https://www.reddit.com/r/bioinformatics/comments/544zqi/comment/d7zpcxj/?utm_source=share&utm_medium=web2x&context=3
-# https://www.affymetrix.com/support/help/faqs/mouse_430/faq_8.affx
-
-# Grab transcript-cluster identifiers that map to multiple gene identifiers.
-eset_final <- eset_rma
-annotated_mul_mapping <- annotated_data %>%
-    group_by(PROBEID) %>%
-    summarize(no_of_matches = n_distinct(ENSEMBL)) %>%
-    dplyr::filter(no_of_matches > 1)
-
-mul_mapping_ids <- (featureNames(eset_rma) %in% annotated_mul_mapping$PROBEID)
-
-eset_final <- eset_rma
-
 # Get the feature data only for the filtered probes.
-fData(eset_final)$PROBEID <- rownames(fData(eset_final))
-fData(eset_final) <- suppressMessages(
-    left_join(
-        fData(eset_final),
-        annotated_data
-    )
-)
+# fData(eset_final)$PROBEID <- rownames(fData(eset_final))
+# fData(eset_final) <- suppressMessages(
+#     left_join(
+#         fData(eset_final),
+#         annotated_data
+#     )
+# )
 # Restore the rownames after performing the left join.
-rownames(fData(eset_final)) <- fData(eset_final)$PROBEID
+# rownames(fData(eset_final)) <- fData(eset_final)$PROBEID
+# annotated_data <- suppressMessages(AnnotationDbi::select(
+#     yeast2.db,
+#     keys = featureNames(eset_rma),
+#     columns = c("PROBEID", "ENSEMBL", "GENENAME"),
+#     keytype = "PROBEID"
+# ))
+
+# Note there is no need to filter low-expressed genes.
+# There is no median intensity below 4, a common threshold.
 
 log_info("Removing control probe sets...")
 control_affymetrix <- grep("AFFX", featureNames(eset_final))
@@ -259,6 +244,21 @@ eset_final <- eset_final[-control_reporter_genes, ]
 log_info("Removing probe sets without ENSEMBL ID...")
 no_ensembl_ids <- is.na(fData(eset_final)$ENSEMBL)
 eset_final <- eset_final[!no_ensembl_ids, ]
+
+# TODO: Select representative probes.
+# https://www.biostars.org/p/47421/
+
+# NOTE: PROBEID corresponds to probeset, not probe:
+# https://www.reddit.com/r/bioinformatics/comments/544zqi/comment/d7zpcxj/?utm_source=share&utm_medium=web2x&context=3
+# https://www.affymetrix.com/support/help/faqs/mouse_430/faq_8.affx
+
+# Grab transcript-cluster identifiers that map to multiple gene identifiers.
+# annotated_mul_mapping <- annotated_data %>%
+#     group_by(PROBEID) %>%
+#     summarize(no_of_matches = n_distinct(ENSEMBL)) %>%
+#     dplyr::filter(no_of_matches > 1)
+
+# mul_mapping_ids <- (featureNames(eset_rma) %in% annotated_mul_mapping$PROBEID)
 
 # Group membership for all samples.
 # Ground vs microgravity.
@@ -325,13 +325,21 @@ de_genes <- subset(de_genes,
 log_info("Adding ENTREZ IDs...")
 # Select the Affymetrix Yeast Genome 2.0 database from ensembl,
 # and submit the query for the ENTREZ IDs.
-ensembl <- useMart("ensembl", dataset = "scerevisiae_gene_ensembl")
-de_genes$ENTREZ <- getBM(
-    attributes = c("affy_yeast_2", "entrezgene_id"),
-    filters = "affy_yeast_2",
-    values = de_genes$PROBEID,
-    mart = ensembl
-)[, 2]
+
+# "Ensembl site unresponsive, trying useast mirror"
+# issue workaround.
+# https://github.com/grimbough/biomaRt/issues/31
+# httr::set_config(httr::config(ssl_verifypeer = FALSE))
+
+# ensembl <- useMart("ensembl", dataset = "scerevisiae_gene_ensembl")
+# entrez <- getBM(
+#     attributes = c("affy_yeast_2", "entrezgene_id"),
+#     filters = "affy_yeast_2",
+#     values = de_genes$PROBEID,
+#     mart = ensembl,
+#     uniqueRows = TRUE
+# )[, 2]
+# TODO: merge with de_genes
 
 de_genes <- as_tibble(de_genes)
 
@@ -351,7 +359,7 @@ results <- decideTests(fit_eb,
 
 if (arguments$qc || arguments$plots) {
     # Venn diagram needs TestResults-class.
-    results_dT <- results
+    results_dt <- results
 }
 # tibble gets all confused with the TestResults-class...
 results <- as.data.frame(results)
@@ -660,7 +668,7 @@ if (arguments$plots) {
         coef = ct,
         main = colnames(fit_eb)[ct],
         pch = 20,
-        highlight = length(which(results_dT[, ct] != 0)),
+        highlight = length(which(results_dt[, ct] != 0)),
         names = rep("+", nrow(fit_eb))
     )
     invisible(dev.off())
@@ -671,7 +679,7 @@ if (arguments$plots) {
     pdf(file = here(plots_dir, "MD.pdf"))
     plotMD(fit_eb,
         column = ct,
-        status = results_dT[, ct],
+        status = results_dt[, ct],
         legend = F,
         pch = 20,
         cex = 1
@@ -681,7 +689,7 @@ if (arguments$plots) {
 
     log_info("Generating Venn diagram...")
     pdf(file = here(plots_dir, "venn.pdf"))
-    vennDiagram(results_dT, circle.col = palette())
+    vennDiagram(results_dt, circle.col = palette())
     invisible(dev.off())
 
     # Generate heatmap where genes are clustered
