@@ -263,7 +263,7 @@ eset_final <- eset_final[!no_ensembl_ids, ]
 # Group membership for all samples.
 # Ground vs microgravity.
 group_membership_ground <- "00011100011000111"
-sml <- strsplit(group_membership_ground, split = "")[[1]]
+sml <- base::strsplit(group_membership_ground, split = "")[[1]]
 
 gs <- factor(sml)
 
