@@ -29,6 +29,9 @@ Coming soon :tm:
   - [Development tips](#development-tips)
 - [Script Rundown](#script-rundown)
   - [Input](#input)
+- [Technical](#technical)
+  - [Computational Reproducibility](#computational-reproducibility)
+    - [renv](#renv)
 
 </details>
 
@@ -143,3 +146,43 @@ So, you have a couple of different options:
 * If you want to time the script call without using some external wrapper program, set the `--time` option
 * [`logger`](https://daroczig.github.io/logger/) is used to log various events to the user. If you want to disable all `INFO`/`WARN` log messages, set the `-q` option
 * By default, messages logged are colorful, using `glue` to format the message and ANSI escape codes, depending on the [`crayon`](https://github.com/r-lib/crayon) package. If that's not to your taste, feel free to use `--no-color`
+
+## Technical
+
+### Computational Reproducibility
+
+What is the point in conducting research behind open doors? Research must be accessible and reproducible. But it must also be **easily** reproducible. Turns out the latter is way more difficult to achieve than the former. There's a couple steps taken to make sure this pipeline is 100% reproducible, but first:
+
+* [Here](https://www.frontiersin.org/articles/10.3389/fninf.2017.00069/full)'s a quick rundown on **replicability**
+* And a little bit [more](http://web.archive.org/web/20210908093208/https://ropensci.github.io/reproducibility-guide/sections/introduction/) from the great folks over at [rOpenSci](https://ropensci.org/)
+
+#### renv
+
+> The renv package is a new effort to bring project-local R dependency management to your projects. [...] Underlying the philosophy of renv is that any of your existing workflows should just work as they did before – renv helps manage library paths (and other project-specific state) to help isolate your project’s R dependencies, and the existing tools you’ve used for managing R packages (e.g. install.packages(), remove.packages()) should work as they did before.
+
+You code some analyses. To run these analyses, you use several packages (aka prewritten bundled code from other kind people). You upload the code. Everyone can download the source and play around tinkering with your creation! Right? Most likely no... Here's some of the reasons why:
+
+* You use a package that depends on (requires) other packages that depend on other packages that depend... and everything is a tedious mess to go through in order to get every prerequisite installed
+* You use a package that has undergone several modifications (or only one) since the time that you used it, and now its functionality has changed and your code no longer works and people might not even know why
+* You use a package that has undergone several modifications (sound familiar?) since the time that you used it, and while the code seems to work, something is slightly off-kilter. Maybe no one spots there are mistakes in the first place
+* You use a lot of different packages to develop your pipeline whilst not working on an isolated environment; you end up using pieces of code (mainly functions) from packages that you already had installed in your system but forgot to mention as dependencies for your pipeline to run... etc.
+
+`renv` to the rescue! By employing renv we can hopefully alleviate some issues that can quickly become painstakingly difficult to resolve if not dealt with snappily enough. From [this](https://www.youtube.com/watch?v=yjlEbIDevOs) great little presentation by [Kevin](https://kevinushey.github.io/):
+
+> You can use `renv` to make your projects more:
+> * **Isolated**: Each project gets its own library of R packages, so you can feel free to upgrade and change package versions in one project without worrying about breaking your other projects. (read: and vice-versa)
+> * **Portable**: Because `renv` captures the state of your R packages within a _lockfile_, you can more easily share and collaborate on projects with others, and ensure that everyone is working from a common base.
+> * **Reproducible**: Use `renv::snapshot()` to save the state of your r  _library_ to the _lockfile_ `renv.lock`. You can later use `renv::restore()` to restore your R library exactly as specified in the lockfile. 
+
+So, in brief:
+
+* `renv` isolates the project; there's no external libraries bleeding in during development, meaning there's no way for you to miss explicitly stating a dependency due to an oversight
+* There's a _lockfile_, called `renv.lock`, that captures all project packages that are directly used, including their dependencies. For every package, the version is also captured. Anyone trying to fiddle with the project can be sure to work with the exact same packages as you, or at least close to that
+* Mainly due to the lockfile, all packages necessary can be installed automatically. This facilitates automation (e.g. for testing), makes it easier for the user, _and_ prevents them from any mistakes they could make during a manual installation
+* and many more :telescope:
+
+Without getting in too much detail, you can simply use `renv` like so:
+
+1. Install `renv` in your local machine, by running something along the lines of `R -e "if (!requireNamespace('renv', quietly = TRUE)) install.packages('renv')"`
+2. Just grab the `renv.lock` lockfile, and run `R -e "renv::restore()`
+3. That's it!
