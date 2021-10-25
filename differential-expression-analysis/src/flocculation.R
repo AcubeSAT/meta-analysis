@@ -11,11 +11,11 @@ suppressWarnings(suppressPackageStartupMessages(library(docopt)))
 "DEA script for GLDS-62 GeneLab entry (raw data).
 
 Usage:
-  flocculation.R [-q | --no-color] [--time]
+  flocculation.R [-q] [--no-color] [--time]
   flocculation.R (-h | --help)
   flocculation.R --version
-  flocculation.R --qc [-r] [-n] [-t] [--plots] [-q | --no-color] [--feather] [--time]
-  flocculation.R --plots [-q | --no-color] [--feather] [--time]
+  flocculation.R --qc [-r] [-n] [-t] [--plots] [-q] [--no-color] [--feather] [--time]
+  flocculation.R --plots [-q] [--no-color] [--feather] [--time]
   flocculation.R --feather [--time]
 
 Options:
@@ -40,10 +40,10 @@ library(logger)
 
 if (arguments$q) {
     log_threshold(SUCCESS)
-} else {
-    if (!arguments$no_color) {
-        log_layout(layout_glue_colors)
-    }
+}
+
+if (!arguments$no_color) {
+    log_layout(layout_glue_colors)
 }
 
 log_info("Importing libraries...")
