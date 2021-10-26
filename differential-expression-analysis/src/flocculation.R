@@ -38,6 +38,9 @@ qc_selected <- any(arguments$r, arguments$n, arguments$t)
 
 library(logger)
 
+# Log messages to stderr instead of stdout.
+log_appender(appender_console)
+
 if (arguments$q) {
     log_threshold(SUCCESS)
 }
