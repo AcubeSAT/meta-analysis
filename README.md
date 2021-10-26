@@ -32,6 +32,7 @@ Coming soon :tm:
 - [Technical](#technical)
   - [Computational Reproducibility](#computational-reproducibility)
     - [renv](#renv)
+    - [Docker](#docker-1)
 
 </details>
 
@@ -186,3 +187,99 @@ Without getting in too much detail, you can simply use `renv` like so:
 1. Install `renv` in your local machine, by running something along the lines of `R -e "if (!requireNamespace('renv', quietly = TRUE)) install.packages('renv')"`
 2. Just grab the `renv.lock` lockfile, and run `R -e "renv::restore()`
 3. That's it!
+
+#### Docker
+
+From the `renv` webpage:
+
+> It is important to emphasize that renv is not a panacea for reproducibility. Rather, it is a tool that can help make projects reproducible by solving one small part of the problem: it records the version of R + R packages being used in a project, and provides tools for reinstalling the declared versions of those packages in a project. Ultimately, making a project reproducible requires some thoughtfulness from the user: what does it mean for a particular project to be reproducible, and how can renv (and other tools) be used to accomplish that particular goal of reproducibility?
+
+> There are a still a number of factors that can affect whether this project could truly be reproducible in the future – for example,
+
+> The results produced by a particular project might depend on other components of the system it’s being run on – for example, the operating system itself, the versions of system libraries in use, the compiler(s) used to compile R and the R packages used, and so on. Keeping a ‘stable’ machine image is a separate challenge, but Docker is one popular solution. [...]
+
+Using `renv` alone can not and will not guarantee your analysis is reproducible.
+Let's try to investigate what's going on here. Imagine these few from the many possible scenarios:
+
+* You use a package that depends on a non-R library that the user has not installed in their machine
+* You use a package that depends on a non-R library that the user can not install in their machine
+* You use a package that depends on a non-R library that the user has installed at a different version, and changing this could break other parts of their system
+* A non-R dependency works different on the user's machine, even if using the exact same version
+* The user's machine uses different computational routines (BLAS, OpenBLAS, LAPACK...) that produce slightly different results (e.g. see [this](vhttps://scicomp.stackexchange.com/questions/26137/are-blas-implementations-guaranteed-to-give-the-exact-same-result))
+* Things on the user's machine were compiled in a different manner
+* The user's machine runs on different hardware
+* ...
+
+So, as you can see, going from mostly reproducible to reproducible involves circumventing a lot of subtle and not-so-subtle pitfalls, not to mention the effort the user must go through to correct something that is awry. It is always better to put in the extra effort yourself, if it is to save others from committing 10x your effort.
+
+In other words, it seems that to get rid of most of our problems, we would need to somehow ensure that the environment state in which we develop must remain identical for the user, not only at the R dependency scope, but many, many abstraction layers lower beyond that. Thankfully, [Docker](https://www.docker.com/) is waiting right around the corner and is what all the cool kids already do.
+
+What Docker allows you to do is essentially bundle up your pipeline, together with all dependencies (libraries and/or binaries), inside a box. Then, you can fetch this box in the machine of your choosing, and look inside it to be transferred in an identical environment/state hustle-free. You can check [this](https://www.youtube.com/watch?v=TvnZTi_gaNc) presentation for a little bit more on the topic.
+
+This box is called a Docker **image** and the blueprint to create it is called a **Dockerfile**. The isolated environment where the pipeline runs is called a Docker **container**.
+
+To get a better look into how this works in our usecase, and why it facilitates replicability, let's take a look into our `Dockerfile`:
+
+```docker
+FROM ubuntu:20.04
+```
+
+Here we choose to base our pipeline environment in Ubuntu Linux 20.04
+
+```docker
+# Dependencies for the R packages.
+RUN apt-get update && apt-get install -y --no-install-recommends \
+libbz2-dev \
+libcairo2-dev \
+libcurl4-openssl-dev \
+libfreetype6-dev \
+libfribidi-dev \
+libharfbuzz-dev \
+libjpeg-dev \
+libpng-dev \
+libproj-dev \
+libssl-dev \
+libtiff5-dev \
+libxml2-dev \
+libxt-dev \
+zlib1g-dev
+```
+
+Remember all the external library dependencies? We make sure they're installed.
+
+```docker
+# Compile dependencies for R and OpenBLAS.
+RUN apt-get install -y --no-install-recommends build-essential \
+cmake \
+g++ \
+gfortran \
+make \
+tk
+```
+
+And remember how what you use to compile things with is important? We take care of that, too.
+
+```docker
+# Install R.
+RUN apt-get install -y --no-install-recommends r-base liblapack-dev
+
+# Install OpenBLAS.
+RUN apt-get install -y --no-install-recommends git
+RUN git clone https://github.com/xianyi/OpenBLAS.git --branch v0.3.15 --depth=1
+WORKDIR /OpenBLAS
+RUN make install
+```
+
+Here we take care of the number-crunching software.
+
+```docker
+RUN R -e "if (!requireNamespace('renv', quietly = TRUE)) install.packages('renv')"
+
+WORKDIR /project
+COPY ./renv.lock .
+# Install all dependencies based on the lock file.
+
+RUN R -e "options(renv.consent = TRUE); options(timeout = 300); renv::restore()"
+```
+
+And, at long last, `renv` inside Docker for the win!
