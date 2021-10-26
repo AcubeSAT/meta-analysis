@@ -35,6 +35,7 @@ Coming soon :tm:
     - [Docker](#docker-1)
     - [CI/CD](#cicd)
   - [Path handling](#path-handling)
+  - [Logging](#logging)
 
 </details>
 
@@ -328,3 +329,46 @@ plots_dir <- here(results_dir, "plots")
 ```
 
 Boom.
+
+### Logging
+
+As mentioned [before](#input), [`logger`](https://daroczig.github.io/logger/) is used to log messages to the user. There are [numerous](https://daroczig.github.io/logger/#why-yet-another-logging-r-package) alternative R packages that can be used.
+
+We can log to `stderr`:
+```r
+library(logger)
+
+log_appender(appender_console)
+```
+
+Change the threshold level based on the levels from Apache [`Log4j`](https://logging.apache.org/log4j/2.x/), namely [these](https://daroczig.github.io/logger/reference/log_levels.html) ones.
+```r
+if (arguments$q) {
+    log_threshold(SUCCESS)
+}
+```
+
+Log messages using different log levels.
+```r
+log_info("Setting up paths...")
+
+log_warn(capture.output(suppressMessages(arrayQualityMetrics(
+            expressionset = cel_affybatch,
+            outdir = here(qc_data_dir, "qc-report-affybatch"),
+            force = TRUE,
+            do.logtransform = TRUE
+))))
+```
+
+Log messages in pretty print.
+```r
+if (!arguments$no_color) {
+    log_layout(layout_glue_colors)
+}
+```
+
+Control our messages programmatically.
+```r
+t <- tic.log()
+log_success("The script finished running successfully! Time: {t}")
+```
