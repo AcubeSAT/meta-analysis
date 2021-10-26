@@ -33,6 +33,7 @@ Coming soon :tm:
   - [Computational Reproducibility](#computational-reproducibility)
     - [renv](#renv)
     - [Docker](#docker-1)
+    - [CI/CD](#cicd)
 
 </details>
 
@@ -121,7 +122,7 @@ Options:
 " -> doc
 ```
 
-First, some `docopt` magic :crystal_ball::
+First, some `docopt` magic: :crystal_ball:
 
 * `[ ]` square brackets indicate **optional elements**
 * `( )` the parentheses mark **required elements**
@@ -283,3 +284,21 @@ RUN R -e "options(renv.consent = TRUE); options(timeout = 300); renv::restore()"
 ```
 
 And, at long last, `renv` inside Docker for the win!
+#### CI/CD
+
+This project uses the [GitLab CI/CD](https://docs.gitlab.com/ee/ci/). Everything happens in the [`.gitlab-ci.yml`](https://gitlab.com/acubesat/su/bioinformatics/meta-analysis/-/blob/master/.gitlab-ci.yml) file:
+
+```yaml
+after_script:
+  - R -e "sessionInfo()"
+
+run:
+  image: xlxs4/meta-analysis:latest
+  script:
+      - Rscript differential-expression-analysis/src/flocculation.R --qc --plots --feather --time
+
+```
+
+This simple set of directives ensures that each time code is pushed upstream, the script can run without crashing.
+The script can run in the environment/container spawned by the Docker image, simplyfying things and also cutting down on CI/CD time.
+There's a lot more that can be done here, but more on that later. Notice how almost everything has been abstracted away using the image.
