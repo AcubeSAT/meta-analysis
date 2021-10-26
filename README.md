@@ -34,6 +34,7 @@ Coming soon :tm:
     - [renv](#renv)
     - [Docker](#docker-1)
     - [CI/CD](#cicd)
+  - [Path handling](#path-handling)
 
 </details>
 
@@ -50,8 +51,8 @@ Coming soon :tm:
 
 ### Docker
 
-First of all, you'll need [Docker](https://www.docker.com/) :whale:
-You can download and install [Docker for Desktop](https://www.docker.com/products/docker-desktop) for starters
+First of all, you'll need [Docker](https://www.docker.com/) :whale:.
+You can download and install [Docker for Desktop](https://www.docker.com/products/docker-desktop) for starters.
 
 ### Grab the Docker image
 
@@ -219,7 +220,7 @@ What Docker allows you to do is essentially bundle up your pipeline, together wi
 
 This box is called a Docker **image** and the blueprint to create it is called a **Dockerfile**. The isolated environment where the pipeline runs is called a Docker **container**.
 
-To get a better look into how this works in our usecase, and why it facilitates replicability, let's take a look into our `Dockerfile`:
+To get a better look into how this works in our usecase, and why it facilitates replicability, let's take a look into our [`Dockerfile`](https://gitlab.com/acubesat/su/bioinformatics/meta-analysis/-/blob/master/Dockerfile):
 
 ```docker
 FROM ubuntu:20.04
@@ -302,3 +303,28 @@ run:
 This simple set of directives ensures that each time code is pushed upstream, the script can run without crashing.
 The script can run in the environment/container spawned by the Docker image, simplyfying things and also cutting down on CI/CD time.
 There's a lot more that can be done here, but more on that later. Notice how almost everything has been abstracted away using the image.
+
+### Path handling
+
+We want to input and output a lot of files in our pipeline. Therefore, we need to handle paths in our code.
+We want to mainly be able to:
+
+1. Use relative instead of absolute, hard-wired paths (reproducibility)
+2. Be able to set and change paths programmatically (reproducibility)
+3. Have some sort of sanity checking when fiddling with paths
+
+If only there was something like Python's [`pathlib`](https://docs.python.org/3/library/pathlib.html) for R...
+
+But there is! And it's called [`here`]()! And [here](https://github.com/jennybc/here_here#tldr)'s (pun intended) some of the reasons why you should use it.
+
+```r
+library(here)
+results_dir <- here(
+    "differential-expression-analysis",
+    "results",
+    "flocculation"
+)
+plots_dir <- here(results_dir, "plots")
+```
+
+Boom.
