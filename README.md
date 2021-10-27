@@ -37,6 +37,7 @@ Coming soon :tm:
   - [Path handling](#path-handling)
   - [Logging](#logging)
   - [Tibbles](#tibbles)
+  - [Feather Files](#feather-files)
 
 </details>
 
@@ -379,3 +380,11 @@ log_success("The script finished running successfully! Time: {t}")
 All resulting dataframes meant to be part of the script output are first converted to [`tibble`](https://tibble.tidyverse.org/)s:
 
 > A tibble, or tbl_df, is a modern reimagining of the data.frame, keeping what time has proven to be effective, and throwing out what is not. Tibbles are data.frames that are lazy and surly: they do less (i.e. they don’t change variable names or types, and don’t do partial matching) and complain more (e.g. when a variable does not exist). This forces you to confront problems earlier, typically leading to cleaner, more expressive code. Tibbles also have an enhanced print() method which makes them easier to use with large datasets containing complex objects.
+
+### Feather Files
+
+The tibbles are then written on-disk as feather files. [Feather](https://github.com/wesm/feather) is a very fast, lightweight, and easy-to-use binary file format to read/write dataframes (tibbles, too!):
+
+> Feather provides binary columnar serialization for data frames. It is designed to make reading and writing data frames efficient, and to make sharing data across data analysis languages easy.
+
+> Feather uses the Apache Arrow columnar memory specification to represent binary data on disk.
