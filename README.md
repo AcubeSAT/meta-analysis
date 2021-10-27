@@ -27,8 +27,6 @@ Coming soon :tm:
   - [Get in](#get-in)
   - [Clone the repository](#clone-the-repository)
   - [Development tips](#development-tips)
-- [Script Rundown](#script-rundown)
-  - [Input](#input)
 - [Technical](#technical)
   - [Computational Reproducibility](#computational-reproducibility)
     - [renv](#renv)
@@ -43,6 +41,9 @@ Coming soon :tm:
   - [GLDS-62](#glds-62)
   - [CEL Files](#cel-files)
   - [Bioconductor](#bioconductor)
+- [Script Rundown](#script-rundown)
+  - [Input](#input)
+  - [Reading in Files](#reading-in-files)
 
 </details>
 
@@ -100,63 +101,6 @@ In that case, get [Windows Terminal](https://aka.ms/terminal)
 * If you want to update the image, e.g. for CI/CD purposes, but have made the changes to the `renv` lockfile inside an attached running Docker container, you can `git clone` the repository in your main working environment, and then grab the updated `renv.lock` file, like this: `docker cp <container_name>:"<path_to_renv.lock>" .`
   Then, just do `docker build -t meta-analysis .`, `docker image tag meta-analysis:latest <repo_name>/meta-analysis:latest` and `docker push <repo_name>/meta-analysis:latest`
 * [`conflicted`](https://www.tidyverse.org/blog/2018/06/conflicted/) is a great `tidyverse` package to check for conflicts arising from ambiguous function names. From within the container, open the R terminal (e.g. `radian`), and `install.packages("conflicted")`. Then, you can just load it (`library(conflicted)`) in the running session. To re-check for conflicts, simply run `conflicted::conflict_scout()`
-
-## Script Rundown
-
-### Input
-
-[`flocculation.R`](https://gitlab.com/acubesat/su/bioinformatics/meta-analysis/-/blob/master/differential-expression-analysis/src/flocculation.R) uses [`docopt`](https://github.com/docopt/docopt.R) :books: to interface with the CLI and parse user input. You can read more on `docopt` [here](http://docopt.org/).
-
-The complete interface for `flocculation.R` can be found inside the script:
-
-```r
-"DEA script for GLDS-62 GeneLab entry (raw data).
-
-Usage:
-  flocculation.R [-q | --no-color] [--time]
-  flocculation.R (-h | --help)
-  flocculation.R --version
-  flocculation.R --qc [-r] [-n] [-t] [--plots] [-q | --no-color] [--feather] [--time]
-  flocculation.R --plots [-q | --no-color] [--feather] [--time]
-  flocculation.R --feather [--time]
-
-Options:
-  -h --help     Show this screen.
-  --version     Show version.
-  --qc          Produce QC reports.
-  --plots       Produce DEA plots.
-  --feather     Save result tibbles as (arrow) feather files.
-  --time        Output script execution time.
-
-" -> doc
-```
-
-First, some `docopt` magic: :crystal_ball:
-
-* `[ ]` square brackets indicate **optional elements**
-* `( )` the parentheses mark **required elements**
-* ` | ` the pipe operator is used to separate **mutually-exclusive elements**
-* `-o` short options can be stacked: `-xyz ≡ -x -y -z`
-
-So, you have a couple of different options:
-
-* Call the script without any additional elements (`flocculation.R`). This will run the script beginning-to-end, excluding all code generating output, be it QC reports, various plots or `arrow:feather` files. Useful mainly to shorten execution time when developing, and to make profiling easier
-* If you want to generate QC reports, you can set the `--qc` option. Note that each time the QC-generating code is called, new reports will be created regardless of whether there are already existing ones. To change this setting, open the script and remove the `force = TRUE` argument inside `arrayQualityMetrics()`. To speed up execution time, you can opt for running only a subset of the QC analyses, namely you can:
-    * Additionally pass `-r` (`--qc -r`) to generate QC for the raw data (pre-RMA)
-    * pass `-n` to generate QC for the normalized data (directly after RMA)
-    * pass `-t` to generate QC for the statistical test results (after the `eBayes()` call on the linear model fit)
-    * Example: `flocculation.R --qc -rt`
-* To generate plots (as `.pdf`s), you can set the `--plots` option. Said plots include:
-    * Various GSEA graphs
-    * [Volcanoplot](https://rdrr.io/bioc/limma/man/volcanoplot.html)
-    * [MD plot](https://www.rdocumentation.org/packages/limma/versions/3.28.14/topics/plotMD) (log2 fold-change vs mean log2 expression)
-    * [Venn diagram](http://web.mit.edu/~r/current/arch/i386_linux26/lib/R/library/limma/html/venn.html)
-    * [Heatmap](https://rdrr.io/bioc/limma/man/coolmap.html) (`coolmap`)
-    * [EnhancedVolcano](https://bioconductor.org/packages/release/bioc/vignettes/EnhancedVolcano/inst/doc/EnhancedVolcano.html)
-* `flocculation.R` uses `tibble`s from [tidyverse](https://tibble.tidyverse.org/) to hold various dataframe-like results. You can have them be saved on-disk as `.feather` [files](https://arrow.apache.org/docs/python/feather.html) by passing `--feather`
-* If you want to time the script call without using some external wrapper program, set the `--time` option
-* [`logger`](https://daroczig.github.io/logger/) is used to log various events to the user. If you want to disable all `INFO`/`WARN` log messages, set the `-q` option
-* By default, messages logged are colorful, using `glue` to format the message and ANSI escape codes, depending on the [`crayon`](https://github.com/r-lib/crayon) package. If that's not to your taste, feel free to use `--no-color`
 
 ## Technical
 
@@ -339,7 +283,7 @@ Boom.
 
 ### Logging
 
-As mentioned [before](#input), [`logger`](https://daroczig.github.io/logger/) is used to log messages to the user. There are [numerous](https://daroczig.github.io/logger/#why-yet-another-logging-r-package) alternative R packages that can be used.
+As mentioned [below](#input), [`logger`](https://daroczig.github.io/logger/) is used to log messages to the user. There are [numerous](https://daroczig.github.io/logger/#why-yet-another-logging-r-package) alternative R packages that can be used.
 
 We can log to `stderr`:
 ```r
@@ -422,3 +366,82 @@ The `.CEL` files are produced by Affymetrix microarray platforms and contain exp
 ### Bioconductor
 
 [Bioconductor](https://bioconductor.org/about/) is a mostly R package repository centered on analyzing biological data (DNA microarray, sequence, SNP...). It is widely used in our pipeline to use various packages such as `affy`, `limma` and more.
+
+## Script Rundown
+
+### Input
+
+[`flocculation.R`](https://gitlab.com/acubesat/su/bioinformatics/meta-analysis/-/blob/master/differential-expression-analysis/src/flocculation.R) uses [`docopt`](https://github.com/docopt/docopt.R) :books: to interface with the CLI and parse user input. You can read more on `docopt` [here](http://docopt.org/).
+
+The complete interface for `flocculation.R` can be found inside the script:
+
+```r
+"DEA script for GLDS-62 GeneLab entry (raw data).
+
+Usage:
+  flocculation.R [-q | --no-color] [--time]
+  flocculation.R (-h | --help)
+  flocculation.R --version
+  flocculation.R --qc [-r] [-n] [-t] [--plots] [-q | --no-color] [--feather] [--time]
+  flocculation.R --plots [-q | --no-color] [--feather] [--time]
+  flocculation.R --feather [--time]
+
+Options:
+  -h --help     Show this screen.
+  --version     Show version.
+  --qc          Produce QC reports.
+  --plots       Produce DEA plots.
+  --feather     Save result tibbles as (arrow) feather files.
+  --time        Output script execution time.
+
+" -> doc
+```
+
+First, some `docopt` magic: :crystal_ball:
+
+* `[ ]` square brackets indicate **optional elements**
+* `( )` the parentheses mark **required elements**
+* ` | ` the pipe operator is used to separate **mutually-exclusive elements**
+* `-o` short options can be stacked: `-xyz ≡ -x -y -z`
+
+So, you have a couple of different options:
+
+* Call the script without any additional elements (`flocculation.R`). This will run the script beginning-to-end, excluding all code generating output, be it QC reports, various plots or `arrow:feather` files. Useful mainly to shorten execution time when developing, and to make profiling easier
+* If you want to generate QC reports, you can set the `--qc` option. Note that each time the QC-generating code is called, new reports will be created regardless of whether there are already existing ones. To change this setting, open the script and remove the `force = TRUE` argument inside `arrayQualityMetrics()`. To speed up execution time, you can opt for running only a subset of the QC analyses, namely you can:
+    * Additionally pass `-r` (`--qc -r`) to generate QC for the raw data (pre-RMA)
+    * pass `-n` to generate QC for the normalized data (directly after RMA)
+    * pass `-t` to generate QC for the statistical test results (after the `eBayes()` call on the linear model fit)
+    * Example: `flocculation.R --qc -rt`
+* To generate plots (as `.pdf`s), you can set the `--plots` option. Said plots include:
+    * Various GSEA graphs
+    * [Volcanoplot](https://rdrr.io/bioc/limma/man/volcanoplot.html)
+    * [MD plot](https://www.rdocumentation.org/packages/limma/versions/3.28.14/topics/plotMD) (log2 fold-change vs mean log2 expression)
+    * [Venn diagram](http://web.mit.edu/~r/current/arch/i386_linux26/lib/R/library/limma/html/venn.html)
+    * [Heatmap](https://rdrr.io/bioc/limma/man/coolmap.html) (`coolmap`)
+    * [EnhancedVolcano](https://bioconductor.org/packages/release/bioc/vignettes/EnhancedVolcano/inst/doc/EnhancedVolcano.html)
+* `flocculation.R` uses `tibble`s from [tidyverse](https://tibble.tidyverse.org/) to hold various dataframe-like results. You can have them be saved on-disk as `.feather` [files](https://arrow.apache.org/docs/python/feather.html) by passing `--feather`
+* If you want to time the script call without using some external wrapper program, set the `--time` option
+* [`logger`](https://daroczig.github.io/logger/) is used to log various events to the user. If you want to disable all `INFO`/`WARN` log messages, set the `-q` option
+* By default, messages logged are colorful, using `glue` to format the message and ANSI escape codes, depending on the [`crayon`](https://github.com/r-lib/crayon) package. If that's not to your taste, feel free to use `--no-color`
+
+### Reading in Files
+
+First, the experimental data from the Affymetrix microarray are loaded by reading the [`.CEL` files](#cel-files). [`full.names`](https://stat.ethz.ch/R-manual/R-devel/library/base/html/list.files.html) is required.
+
+```r
+cel_affybatch <- ReadAffy(filenames = list.celfiles(
+    raw_data_dir,
+    full.names = TRUE
+))
+```
+
+The Yeast Genome 2.0 Array [contains probe sets](https://www.affymetrix.com/support/technical/datasheets/yeast2_datasheet.pdf) to detect transcripts from both *Saccharomyces cerevisiae* and *Schizosaccharomyces pombe*. However, we are only interested in the *S. cerevisiae* data for our analysis. To filter out the *pombe* data, we can use a maskfile provided by [Affymetrix](http://www.affymetrix.com/Auth/support/downloads/maskfiles/scerevisiae.zip).
+
+```r
+s_cerevisiae_mask <- read.table(
+    mask_data_dir,
+    skip = 2,
+    stringsAsFactors = FALSE
+)
+probe_filter <- s_cerevisiae_mask[[1]]
+```
