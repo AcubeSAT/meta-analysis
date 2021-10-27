@@ -39,6 +39,8 @@ Coming soon :tm:
   - [Tibbles](#tibbles)
   - [Feather Files](#feather-files)
   - [NASA GeneLab](#nasa-genelab)
+  - [Original Publication](#original-publication)
+  - [GLDS-62](#glds-62)
 
 </details>
 
@@ -393,3 +395,20 @@ The tibbles are then written on-disk as feather files. [Feather](https://github.
 ### NASA GeneLab
 
 [NASA Genelab](https://genelab.nasa.gov/) is an open-source, comprehensive space-related omics platform. To learn more about GeneLab you can begin from their [about](https://genelab.nasa.gov/about) page. Our analysis works on raw data from this platform. Information here is tidy, with most of the uploaded files having been processed by the GeneLab Team. There's some additional cool features, like the [visualization page](https://visualization.genelab.nasa.gov/data/GLDS-62).
+
+### Original Publication
+
+[Goossens, K. V., Ielasi, F. S., Nookaew, I., Stals, I., Alonso-Sarduy, L., Daenen, L., ... & Willaert, R. G. (2015). Molecular mechanism of flocculation self-recognition in yeast and its role in mating and survival. MBio, 6(2), e00427-15.](https://www.ncbi.nlm.nih.gov/pmc/articles/PMC4453552/)
+
+TODO: @elsandal, give a brief description and mention why we can do our own DEA on these data maybe?
+
+### GLDS-62
+
+[`GLDS-62`](https://genelab-data.ndc.nasa.gov/genelab/accession/GLDS-62/) is the GeneLab accession number for all the data related to the Goossens et al. 2015 publication. From other potentially useful microarray data we came across, these were selected to analyze, for several reasons:
+
+* The experiments were conducted using Affymetrix microarrays, specifically the Affymetrix Yeast Genome 2.0. We found data from these received greater support and were easier to work with than, say, the Hitachisoft Hypergene Yeast Chip Ver. 2.0
+* How the data was processed and analyzed in the original publication is relatively clear and straightforward:
+    > Raw .CEL files were read in and normalized using the r script 'affyNormQC.R' which utilizes the RMA algorithm through the oligo R package [rma() with default parameters]. Quality control reports were generated via the r script 'affyNormQC.R', with parameter 'do.logtransform' set to TRUE for the generating the raw report. This microarray experiment was annotated with the r script 'annotateProbes.R' which utilized Annotation-Db class probe annotations specific to each chip from the Bioconductor repository. In cases where multiple probes mapped to the same gene ID, representative probes were selected with the highest mean normalized intensity across all samples. Differential gene expression analysis was performed using the r script limmaDiffExp.R which utilizes the limma R package to perform pair-wise comparisons for all groups. For each probe set, the variance of mean signal intensities was estimated, improved by an empirical Bayes method for combining variances of probes showing similar variability, and the significance of the difference between the means was evaluated with a t-test to obtain p-values. P-values were adjusted for multiple hypothesis testing using the Benjamini and Hochberg method to control the false discovery rate.
+* While the authors didn't provide the source code of their analysis, specific [GeneLab scripts](https://github.com/jdrubin91/GeneLab-Microarray/tree/master/GeneLab-Microarray/R_scripts) were used for all the pipeline stages
+* Additional to the raw data and the DE genes list, the authors uploaded the data across the various analysis steps (preprocessing, normalization...), including their QC
+* The experimental design was sound, and the data of adequate quality, with no significant outliers and good QC
