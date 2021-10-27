@@ -44,6 +44,7 @@ Coming soon :tm:
 - [Script Rundown](#script-rundown)
   - [Input](#input)
   - [Reading in Files](#reading-in-files)
+  - [Helper functions](#helper-functions)
 
 </details>
 
@@ -444,4 +445,85 @@ s_cerevisiae_mask <- read.table(
     stringsAsFactors = FALSE
 )
 probe_filter <- s_cerevisiae_mask[[1]]
+```
+
+### Helper functions
+
+Besides the [`flocculation.R`](https://gitlab.com/acubesat/su/bioinformatics/meta-analysis/-/blob/master/differential-expression-analysis/src/flocculation.R) main script, there's also [`helpers.R`](https://gitlab.com/acubesat/su/bioinformatics/meta-analysis/-/blob/master/differential-expression-analysis/src/helpers.R). Here, the two functions of note are `extract_ids()` and `remove_probes()`.
+
+```r
+extract_ids <- function(annotation_data_dir, probe_filter) {
+    # Get both S. pombe & S. cerevisiae ids.
+    genenames <- as.list(yeast2.db::yeast2GENENAME)
+    probes <- names(genenames)
+
+    # Get all transcript ids from yeast2annotation.csv.
+    annotations <- read.csv(
+        file = annotation_data_dir, header = TRUE,
+        stringsAsFactors = FALSE
+    )
+    transcript_id <- annotations[, 3]
+    probeset_id <- annotations[, 1]
+
+    # Reorder the transcript_id to match probes.
+    transcript_id <- transcript_id[match(probes, probeset_id)]
+
+    # Retrieve the probeset and transcript ids for S. cerevisiae.
+    c_probe_id <- probes[-match(probe_filter, probes)]
+    c_transcript_id <- transcript_id[-match(probe_filter, probes)]
+
+    # We need the TranscriptID if the gene name is NA.
+    yeast_genenames <- transcript_id
+    for (i in seq(along = probeset_id)) {
+        gname <- genenames[i][[1]]
+        if (!is.na(gname)) {
+            yeast_genenames[i] <- gname
+        }
+    }
+
+    # Set the gene name.
+    c_genename <- yeast_genenames[-match(probe_filter, probes)]
+    df <- tibble(
+        probe = c_probe_id, transcript = c_transcript_id,
+        genename = c_genename
+    )
+    return(df)
+}
+```
+
+`remove_probes()` is more interesting:
+
+```r
+remove_probes <- function(list_out_probe_sets,
+                          cdfpackagename,
+                          probepackagename) {
+    # list_out_probe_sets: Probe sets that are removed.
+
+    # cdfpackagename: The cdf package name.
+    # probepackagename: The probe package name.
+    probe_env_org <- get(probepackagename)
+
+    # Remove probesets from the CDF environment.
+    rm(list = list_out_probe_sets, envir = get(cdfpackagename))
+
+    # Set the PROBE env accordingly.
+    tmp <- get("xy2indices", paste("package:", cdfpackagename, sep = ""))
+
+    # cleancdf is from cdfpackagename... I think.
+    new_affybatch <- new("AffyBatch", cdfName = cleancdf)
+    pm_index <- unlist(affy::indexProbes(new_affybatch, "pm"))
+    sub_index <- match(tmp(probe_env_org$x, probe_env_org$y,
+        cdf = cdfpackagename
+    ), pm_index)
+
+    i_na <- which(is.na(sub_index))
+
+    # Need to unlock the environment binding to alter the probes.
+    ipos <- grep(probepackagename, search())
+    env <- as.environment(search()[ipos])
+
+    unlockBinding(probepackagename, env)
+    assign(probepackagename, probe_env_org[-i_na, ], env = env)
+    lockBinding(probepackagename, env)
+}
 ```
