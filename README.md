@@ -36,6 +36,7 @@ Coming soon :tm:
     - [CI/CD](#cicd)
   - [Path handling](#path-handling)
   - [Logging](#logging)
+  - [Tibbles](#tibbles)
 
 </details>
 
@@ -57,8 +58,8 @@ You can download and install [Docker for Desktop](https://www.docker.com/product
 
 ### Grab the Docker image
 
-* Open your favorite terminal. If you think you don't have one, you're on Windows
-  In that case, get [Windows Terminal](https://aka.ms/terminal)
+* Open your favorite terminal. If you think you don't have one, you're on Windows.
+In that case, get [Windows Terminal](https://aka.ms/terminal)
 * You can pull the image straight from the cloud: `docker pull xlxs4/meta-analysis:latest`
 * ...  or you can build it yourself (something like `docker build -t meta-analysis .`)
 
@@ -372,3 +373,9 @@ Control our messages programmatically.
 t <- tic.log()
 log_success("The script finished running successfully! Time: {t}")
 ```
+
+### Tibbles
+
+All resulting dataframes meant to be part of the script output are first converted to [`tibble`](https://tibble.tidyverse.org/)s:
+
+> A tibble, or tbl_df, is a modern reimagining of the data.frame, keeping what time has proven to be effective, and throwing out what is not. Tibbles are data.frames that are lazy and surly: they do less (i.e. they don’t change variable names or types, and don’t do partial matching) and complain more (e.g. when a variable does not exist). This forces you to confront problems earlier, typically leading to cleaner, more expressive code. Tibbles also have an enhanced print() method which makes them easier to use with large datasets containing complex objects.
