@@ -41,6 +41,7 @@ Coming soon :tm:
   - [NASA GeneLab](#nasa-genelab)
   - [Original Publication](#original-publication)
   - [GLDS-62](#glds-62)
+  - [CEL Files](#cel-files)
 
 </details>
 
@@ -412,3 +413,7 @@ TODO: @elsandal, give a brief description and mention why we can do our own DEA 
 * While the authors didn't provide the source code of their analysis, specific [GeneLab scripts](https://github.com/jdrubin91/GeneLab-Microarray/tree/master/GeneLab-Microarray/R_scripts) were used for all the pipeline stages
 * Additional to the raw data and the DE genes list, the authors uploaded the data across the various analysis steps (preprocessing, normalization...), including their QC
 * The experimental design was sound, and the data of adequate quality, with no significant outliers and good QC
+
+### CEL Files
+
+The `.CEL` files are produced by Affymetrix microarray platforms and contain experiment-specific information, such as intensity value and standard deviation, potential outliers as indicated by some preprocessing algorithms, etc. The microarray used in this study produces [Command Console](https://www.affymetrix.com/support/developer/powertools/changelog/gcos-agcc/cel.html#calvin) CEL files.
