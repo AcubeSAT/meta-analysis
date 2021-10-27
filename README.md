@@ -42,6 +42,7 @@ Coming soon :tm:
   - [Original Publication](#original-publication)
   - [GLDS-62](#glds-62)
   - [CEL Files](#cel-files)
+  - [Bioconductor](#bioconductor)
 
 </details>
 
@@ -417,3 +418,7 @@ TODO: @elsandal, give a brief description and mention why we can do our own DEA 
 ### CEL Files
 
 The `.CEL` files are produced by Affymetrix microarray platforms and contain experiment-specific information, such as intensity value and standard deviation, potential outliers as indicated by some preprocessing algorithms, etc. The microarray used in this study produces [Command Console](https://www.affymetrix.com/support/developer/powertools/changelog/gcos-agcc/cel.html#calvin) CEL files.
+
+### Bioconductor
+
+[Bioconductor](https://bioconductor.org/about/) is a mostly R package repository centered on analyzing biological data (DNA microarray, sequence, SNP...). It is widely used in our pipeline to use various packages such as `affy`, `limma` and more.
