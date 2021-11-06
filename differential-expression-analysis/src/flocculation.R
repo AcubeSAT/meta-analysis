@@ -325,7 +325,7 @@ de_genes <- subset(de_genes,
     )
 )
 
-log_info("Adding ENTREZ IDs...")
+# log_info("Adding ENTREZ IDs...")
 # Select the Affymetrix Yeast Genome 2.0 database from ensembl,
 # and submit the query for the ENTREZ IDs.
 
