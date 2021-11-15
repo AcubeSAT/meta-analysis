@@ -287,6 +287,7 @@ colnames(design_matrix) <- levels(gs)
 # Due to the low number of replicates (common in microarray datasets),
 # using the robust estimation could remove real variation,
 # resulting to more false-positives.
+# https://support.bioconductor.org/p/25749/
 log_info("Fitting linear models...")
 fit <- lmFit(eset_final, design_matrix)
 

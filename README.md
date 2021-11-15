@@ -51,6 +51,7 @@ Coming soon :tm:
   - [Removing probesets](#removing-probesets)
   - [Selecting representative probes](#selecting-representative-probes)
   - [Creating the design matrix](#creating-the-design-matrix)
+  - [Fitting the linear models](#fitting-the-linear-models)
 
 </details>
 
@@ -810,3 +811,13 @@ GSM1571876_hyb8624.CEL        1     0
 Which corresponds to the following linear equation:
 
 `y = mean(on ground) + mean(micro)`
+
+### Fitting the linear models
+
+`limma::lmFit()` is used to fit the multiple linear models, according to the design matrix we generated.
+`lmFit()` fits linear models with generalized or weighted least squares. The `method=robust` argument can be passed to have robust regression instead (see the [man](https://bioconductor.org/packages/devel/bioc/manuals/limma/man/limma.pdf) for more info).
+As stated in [this BioC thread](https://support.bioconductor.org/p/25749/), we opt for least squares, since there is a low number of replicates (triplicates and a duplicate) and we want to avoid removing real variation.
+
+```r
+fit <- lmFit(eset_final, design_matrix)
+```
