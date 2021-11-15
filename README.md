@@ -52,6 +52,7 @@ Coming soon :tm:
   - [Selecting representative probes](#selecting-representative-probes)
   - [Creating the design matrix](#creating-the-design-matrix)
   - [Fitting the linear models](#fitting-the-linear-models)
+  - [Creating the contrast matrix](#creating-the-contrast-matrix)
 
 </details>
 
@@ -822,4 +823,15 @@ As stated in [this BioC thread](https://support.bioconductor.org/p/25749/), we o
 
 ```r
 fit <- lmFit(eset_final, design_matrix)
+```
+
+### Creating the contrast matrix
+
+See this [StackExchange thread](https://stats.stackexchange.com/questions/78354/what-is-a-contrast-matrix) for some excellent answers on what a contrast matrix is. In our case, all we need to do is create our contrast matrix (control vs microgravity), recaluclate the model coefficients and re-orientate the previously fitted model to the set of contrasts of the original coefficients:
+
+```r
+contrast <- paste(groups[1], groups[2], sep = "-")
+contrast_matrix <- makeContrasts(contrasts = contrast, levels = design_matrix)
+
+fit2 <- contrasts.fit(fit, contrast_matrix)
 ```
