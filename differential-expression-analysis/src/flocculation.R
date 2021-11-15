@@ -243,7 +243,7 @@ eset_final <- eset_final[-control_reporter_genes, ]
 
 # yeast2.db doesn't have SYMBOL.
 # However, ENSEMBL also maps to ENTREZ.
-# Remove the probes that do not map to an ENSEMBL/ENTREZ ID.
+# Remove the probesets that do not map to an ENSEMBL/ENTREZ ID.
 log_info("Removing probe sets without ENSEMBL ID...")
 no_ensembl_ids <- is.na(fData(eset_final)$ENSEMBL)
 eset_final <- eset_final[!no_ensembl_ids, ]

@@ -48,6 +48,7 @@ Coming soon :tm:
   - [QC](#qc)
   - [RMA](#rma)
   - [Annotation](#annotation)
+  - [Removing probesets](#removing-probesets)
 
 </details>
 
@@ -695,7 +696,7 @@ The annotation data can be in SQL table(s) form, a CSV file, it can be fetched b
 
 This is following standard [Relational Algebra](https://www.wikiwand.com/en/Relational_algebra).
 
-Previously we [mentioned](#bioconductor), which also provides "extensive annotation resources", that are either _gene centric_ or _genome centric_. For an intro into the various Bioconductor annotation packages you can check [here](https://bioconductor.org/packages/release/bioc/vignettes/AnnotationDbi/inst/doc/IntroToAnnotationPackages.pdf). There are different kinds of packages, and each comes with a different kind of objects, for example:
+Previously we [mentioned](#bioconductor) Bioconductor, which also provides "extensive annotation resources", that are either _gene centric_ or _genome centric_. For an intro into the various Bioconductor annotation packages you can check [here](https://bioconductor.org/packages/release/bioc/vignettes/AnnotationDbi/inst/doc/IntroToAnnotationPackages.pdf). There are different kinds of packages, and each comes with a different kind of objects, for example:
 
 1) the `AnnotationDb` objects
 2) the `ChipDb` objects
@@ -719,4 +720,23 @@ However, still it is a tedious, prone to error process. Helpfully, this is where
 
 ```r
 annotateEset(eset_rma, yeast2.db, columns = c("PROBEID", "ENSEMBL", "GENENAME"))
+```
+
+### Removing probesets
+
+We must take care of some lingering probesets. The Affymetrix platforms include two types of probesets that can be removed post-normalization; the `AFFX` and the `RPTR`-labeled probesets, respectively. The `AFFX` probesets are control probesets, while the `RPTR` have to do with reporter genes:
+
+```r
+control_affymetrix <- grep("AFFX", featureNames(eset_final))
+eset_final <- eset_final[-control_affymetrix, ]
+
+control_reporter_genes <- grep("RPTR", featureNames(eset_final))
+eset_final <- eset_final[-control_reporter_genes, ]
+```
+
+Since this analysis is conducted to help select the genes the expression of which will be probed on-board our nanosatellite, all probesets that do not map to an ENSEMBL/ENTREZ ID (and therefore do not map to a distinct `GENENAME`) are also removed from our study:
+
+```r
+no_ensembl_ids <- is.na(fData(eset_final)$ENSEMBL)
+eset_final <- eset_final[!no_ensembl_ids, ]
 ```
