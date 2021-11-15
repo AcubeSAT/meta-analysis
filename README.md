@@ -49,6 +49,7 @@ Coming soon :tm:
   - [RMA](#rma)
   - [Annotation](#annotation)
   - [Removing probesets](#removing-probesets)
+  - [Selecting representative probes](#selecting-representative-probes)
 
 </details>
 
@@ -740,3 +741,10 @@ Since this analysis is conducted to help select the genes the expression of whic
 no_ensembl_ids <- is.na(fData(eset_final)$ENSEMBL)
 eset_final <- eset_final[!no_ensembl_ids, ]
 ```
+
+### Selecting representative probes
+
+Another somewhat common occurence when dealing with microarray data is coming across probesets that get annotated to multiple gene identifiers.
+This might be confusing to some, and I find that there is an helpful distinction to be made (also highlighted above, remember?).
+At least when working with Affymetrix arrays, each ID corresponds to a probe _set_, **not** an individual probe. Thus, each ID is a bundle of individual probes. See [here](https://www.reddit.com/r/bioinformatics/comments/544zqi/multiple_probes_for_one_gene/d7zpcxj) for an explanatory post, and [here](https://www.affymetrix.com/support/help/faqs/mouse_430/faq_8.affx) to better understand the different Affymetrix probe sets and suffixes in the probe IDs.
+Before conducting a DEA, it is best to select some representative probes, if possible. See [this](https://www.biostars.org/p/47421/) Biostars post for more information on the matter and alternative approaches.
