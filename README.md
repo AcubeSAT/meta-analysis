@@ -812,6 +812,8 @@ Which corresponds to the following linear equation:
 
 `y = mean(on ground) + mean(micro)`
 
+The design matrix is essentially a incident matrix with `1` if the sample was subjected in simulated microgravity conditions and `0` otherwise. By default, `model.matrix()` includes a column of all 1's representing $`\mu`$ in the ANOVA model $`Y_{ij} = \mu + \alpha_{i} + \mathrm{error}`$ (see [this](https://www.bioconductor.org/packages/release/data/experiment/vignettes/ChimpHumanBrainData/inst/doc/DiffExpressVignette.pdf)).
+
 ### Fitting the linear models
 
 `limma::lmFit()` is used to fit the multiple linear models, according to the design matrix we generated.
