@@ -50,6 +50,7 @@ Coming soon :tm:
   - [Annotation](#annotation)
   - [Removing probesets](#removing-probesets)
   - [Selecting representative probes](#selecting-representative-probes)
+  - [Creating the design matrix](#creating-the-design-matrix)
 
 </details>
 
@@ -748,3 +749,64 @@ Another somewhat common occurence when dealing with microarray data is coming ac
 This might be confusing to some, and I find that there is an helpful distinction to be made (also highlighted above, remember?).
 At least when working with Affymetrix arrays, each ID corresponds to a probe _set_, **not** an individual probe. Thus, each ID is a bundle of individual probes. See [here](https://www.reddit.com/r/bioinformatics/comments/544zqi/multiple_probes_for_one_gene/d7zpcxj) for an explanatory post, and [here](https://www.affymetrix.com/support/help/faqs/mouse_430/faq_8.affx) to better understand the different Affymetrix probe sets and suffixes in the probe IDs.
 Before conducting a DEA, it is best to select some representative probes, if possible. See [this](https://www.biostars.org/p/47421/) Biostars post for more information on the matter and alternative approaches.
+
+### Creating the design matrix
+
+We'll go over Linear Regression Models and DEA below.
+How these are implemented in R is very straightforward, beginning with creating the design matrix.
+
+First, we need to label our microarray samples with the respective group they belong in, as per the experimental design. In our case, this can be found in the [respective GEO (Gene Expression Omnibus) entry](https://www.ncbi.nlm.nih.gov/geo/geo2r/?acc=GSE64468). Since we are only interested in comparing between the on-ground control samples and the ones exposed to the simulated low-shear microgravity environmental conditions, we don't distinguish between wildtype, FLO1 and FLO8 samples. You can find more on the `factor` object [here](https://www.rdocumentation.org/packages/base/versions/3.6.2/topics/factor).
+
+```r
+group_membership_ground <- "00011100011000111"
+sml <- base::strsplit(group_membership_ground, split = "")[[1]]
+
+gs <- factor(sml)
+```
+
+```
+r$> gs
+[1] 0 0 0 1 1 1 0 0 0 1 1 0 0 0 1 1 1
+Levels: 0 1
+```
+
+We label for each sample (total of 17):
+
+```r
+groups <- make.names(c("onground", "micro"))
+
+levels(gs) <- groups
+eset_final$group <- gs
+```
+
+```
+r$> gs  
+ [1] onground onground onground micro    micro    micro    onground onground onground micro    micro    onground onground onground micro    micro    micro   
+Levels: onground micro
+```
+
+After this preperation, we can create our independent t-test design matrix by calling `model.matrix()`:
+
+```r
+design_matrix <- model.matrix(~ group + 0, eset_final)
+colnames(design_matrix) <- levels(gs)
+```
+
+We get this design matrix:
+
+```
+r$> design_matrix    
+                       onground micro
+GSM1571870_hyb8616.CEL        1     0
+GSM1571871_hyb8617.CEL        1     0
+GSM1571872_hyb8620.CEL        1     0
+GSM1571873_hyb8618.CEL        0     1
+GSM1571874_hyb8621.CEL        0     1
+GSM1571875_hyb8622.CEL        0     1
+GSM1571876_hyb8624.CEL        1     0
+...
+```
+
+Which corresponds to the following linear equation:
+
+`y = mean(on ground) + mean(micro)`
