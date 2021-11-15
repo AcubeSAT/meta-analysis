@@ -53,6 +53,7 @@ Coming soon :tm:
   - [Creating the design matrix](#creating-the-design-matrix)
   - [Fitting the linear models](#fitting-the-linear-models)
   - [Creating the contrast matrix](#creating-the-contrast-matrix)
+  - [Empirical Bayes](#empirical-bayes)
 
 </details>
 
@@ -835,3 +836,18 @@ contrast_matrix <- makeContrasts(contrasts = contrast, levels = design_matrix)
 
 fit2 <- contrasts.fit(fit, contrast_matrix)
 ```
+
+### Empirical Bayes
+
+We can employ Empirical Bayes (EB) statistical tests that use moderated genewise variances through [`limma::eBayes()`](http://web.mit.edu/~r/current/arch/i386_linux26/lib/R/library/limma/html/ebayes.html), which ranks genes in order of evidence for differential expression, by:
+1) using an empirical Bayes method to shrink the probe-wise sample variances towards a common value and
+2) augmenting the degrees of freedom for the individual variances
+
+See [2] for more. Additionally, the `robust = TRUE` argument is passed, to robustify the hyperparameter estimation as seen in [3]. This deals with outlier genes (genes with very large or small variances) greatly affecting the Empirical Bayes statistical tests.
+
+```r
+fit_eb <- eBayes(fit2, robust = TRUE)
+```
+
+[2]: Smyth, G. K. (2004). Linear models and empirical bayes methods for assessing differential expression in microarray experiments. Statistical applications in genetics and molecular biology, 3(1).
+[3]: Phipson, B., Lee, S., Majewski, I. J., Alexander, W. S., & Smyth, G. K. (2016). Robust hyperparameter estimation protects against hypervariable genes and improves power to detect differential expression. The annals of applied statistics, 10(2), 946.
