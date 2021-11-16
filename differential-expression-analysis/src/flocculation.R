@@ -358,7 +358,8 @@ log_info("Running decideTests...")
 results <- decideTests(fit_eb,
     adjust.method = "BH",
     p.value = pval_cutoff,
-    lfc = lfc_cutoff
+    lfc = lfc_cutoff,
+    method = "nestedF"
 )
 
 if (arguments$qc || arguments$plots) {
