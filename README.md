@@ -54,6 +54,7 @@ Coming soon :tm:
   - [Fitting the linear models](#fitting-the-linear-models)
   - [Creating the contrast matrix](#creating-the-contrast-matrix)
   - [Empirical Bayes](#empirical-bayes)
+  - [Selecting DE genes](#selecting-de-genes)
 
 </details>
 
@@ -851,3 +852,26 @@ fit_eb <- eBayes(fit2, robust = TRUE)
 
 [3]: Smyth, G. K. (2004). Linear models and empirical bayes methods for assessing differential expression in microarray experiments. Statistical applications in genetics and molecular biology, 3(1).
 [4]: Phipson, B., Lee, S., Majewski, I. J., Alexander, W. S., & Smyth, G. K. (2016). Robust hyperparameter estimation protects against hypervariable genes and improves power to detect differential expression. The annals of applied statistics, 10(2), 946.
+
+### Selecting DE genes
+
+`fit_eb` now contains everything our `fit2` linear model fit comes with, plus some added components, such as `t`, the matrix of moderated t-statistics, and `p.value`, the p-values corresponding to the t-statistics.
+`limma::topTable()` uses these statistics to extract the top-ranked genes from our linear model fit:
+
+```r
+de_genes <- topTable(fit_eb,
+    number = 30,
+    adjust.method = "BH",
+    sort.by = "B",
+    p.value = pval_cutoff,
+    lfc = lfc_cutoff
+)
+```
+
+* `adjust.method` sets the method used by [stats::p.adjust()](https://www.rdocumentation.org/packages/stats/versions/3.6.2/topics/p.adjust) to adjust the p-values from `eBayes()`. The commonly used Benjamini & Hochberg [5] method is selected here. The Benjamini & Hochberg method controls the FDR, a less stringent condition than the family-wise error rate, so it's more powerful than the other methods available except Benjamini & Yekutieli [6]
+For an intro to `BH` and `BY` see [these slides](http://www.stat.cmu.edu/~genovese/talks/hannover1-04.pdf) by CMU's Christopher R. Genovese.
+* The criterion used to select the top genes is the B-statistic, the log-odds that the gene is differentially expressed (see `limma`'s [Users Guide](https://bioconductor.org/packages/release/bioc/vignettes/limma/inst/doc/usersguide.pdf))
+* Lastly, we filter our DE genes according to both an adjusted p-value and a log-fold change threshold
+
+[5]: Benjamini, Y., & Hochberg, Y. (1995). Controlling the false discovery rate: a practical and powerful approach to multiple testing. Journal of the Royal statistical society: series B (Methodological), 57(1), 289-300.
+[6]: Benjamini, Y., & Yekutieli, D. (2001). The control of the false discovery rate in multiple testing under dependency. Annals of statistics, 1165-1188.
