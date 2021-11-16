@@ -851,6 +851,7 @@ fit_eb <- eBayes(fit2, robust = TRUE)
 ```
 
 [3]: Smyth, G. K. (2004). Linear models and empirical bayes methods for assessing differential expression in microarray experiments. Statistical applications in genetics and molecular biology, 3(1).
+
 [4]: Phipson, B., Lee, S., Majewski, I. J., Alexander, W. S., & Smyth, G. K. (2016). Robust hyperparameter estimation protects against hypervariable genes and improves power to detect differential expression. The annals of applied statistics, 10(2), 946.
 
 ### Selecting DE genes
@@ -873,5 +874,43 @@ For an intro to `BH` and `BY` see [these slides](http://www.stat.cmu.edu/~genove
 * The criterion used to select the top genes is the B-statistic, the log-odds that the gene is differentially expressed (see `limma`'s [Users Guide](https://bioconductor.org/packages/release/bioc/vignettes/limma/inst/doc/usersguide.pdf))
 * Lastly, we filter our DE genes according to both an adjusted p-value and a log-fold change threshold
 
+We end up with a `tibble` with a row for each gene considered differentially expressed and with the following columns:
+
+```r
+de_genes <- subset(de_genes,
+    select = c(
+        "PROBEID",
+        "adj.P.Val",
+        "P.Value",
+        "t",
+        "B",
+        "logFC",
+        "ENSEMBL",
+        "GENENAME"
+    )
+)
+
+de_genes <- as_tibble(de_genes)
+```
+
+```
+r$> de_genes  
+# A tibble: 25 × 8
+   PROBEID    adj.P.Val      P.Value     t     B logFC ENSEMBL GENENAME
+   <chr>          <dbl>        <dbl> <dbl> <dbl> <dbl> <chr>   <chr>   
+ 1 1776010_at  0.000157 0.0000000555  8.76  8.36 1.04  YJL190C RPS22A  
+ 2 1777989_at  0.000617 0.000000327   7.76  6.77 0.999 YLR406C RPL31B  
+ 3 1773591_at  0.000712 0.000000503   7.53  6.38 1.04  YMR199W CLN1    
+ 4 1772366_at  0.00153  0.00000135    7.01  5.48 1.20  YML063W RPS1B   
+ 5 1775167_at  0.00586  0.0000259     5.56  2.74 0.959 YER131W RPS26B  
+ 6 1775536_at  0.00640  0.0000317     5.47  2.55 1.04  YLR061W RPL22A  
+ 7 1779506_at  0.00748  0.0000397     5.36  2.34 1.09  YEL040W UTR2    
+ 8 1778270_at  0.00759  0.0000443     5.31  2.24 1.00  YDL227C HO      
+ 9 1771085_at  0.00771  0.0000490     5.27  2.14 1.14  YNL301C RPL18A  
+10 1775720_at  0.00958  0.0000728     5.08  1.77 0.950 YML027W YOX1    
+# … with 15 more rows
+```
+
 [5]: Benjamini, Y., & Hochberg, Y. (1995). Controlling the false discovery rate: a practical and powerful approach to multiple testing. Journal of the Royal statistical society: series B (Methodological), 57(1), 289-300.
+
 [6]: Benjamini, Y., & Yekutieli, D. (2001). The control of the false discovery rate in multiple testing under dependency. Annals of statistics, 1165-1188.
