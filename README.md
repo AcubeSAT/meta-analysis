@@ -894,21 +894,21 @@ de_genes <- as_tibble(de_genes)
 ```
 
 ```
-r$> de_genes  
-# A tibble: 25 × 8
-   PROBEID    adj.P.Val      P.Value     t     B logFC ENSEMBL GENENAME
-   <chr>          <dbl>        <dbl> <dbl> <dbl> <dbl> <chr>   <chr>   
- 1 1776010_at  0.000157 0.0000000555  8.76  8.36 1.04  YJL190C RPS22A  
- 2 1777989_at  0.000617 0.000000327   7.76  6.77 0.999 YLR406C RPL31B  
- 3 1773591_at  0.000712 0.000000503   7.53  6.38 1.04  YMR199W CLN1    
- 4 1772366_at  0.00153  0.00000135    7.01  5.48 1.20  YML063W RPS1B   
- 5 1775167_at  0.00586  0.0000259     5.56  2.74 0.959 YER131W RPS26B  
- 6 1775536_at  0.00640  0.0000317     5.47  2.55 1.04  YLR061W RPL22A  
- 7 1779506_at  0.00748  0.0000397     5.36  2.34 1.09  YEL040W UTR2    
- 8 1778270_at  0.00759  0.0000443     5.31  2.24 1.00  YDL227C HO      
- 9 1771085_at  0.00771  0.0000490     5.27  2.14 1.14  YNL301C RPL18A  
-10 1775720_at  0.00958  0.0000728     5.08  1.77 0.950 YML027W YOX1    
-# … with 15 more rows
+r$> de_genes     
+# A tibble: 242 × 8
+   PROBEID      adj.P.Val      P.Value     t     B logFC ENSEMBL GENENAME
+   <chr>            <dbl>        <dbl> <dbl> <dbl> <dbl> <chr>   <chr>   
+ 1 1771832_at    0.000142 0.0000000251  9.21  9.06 0.865 YDR418W RPL12A  
+ 2 1776010_at    0.000157 0.0000000555  8.76  8.36 1.04  YJL190C RPS22A  
+ 3 1777989_at    0.000617 0.000000327   7.76  6.77 0.999 YLR406C RPL31B  
+ 4 1773591_at    0.000712 0.000000503   7.53  6.38 1.04  YMR199W CLN1    
+ 5 1772366_at    0.00153  0.00000135    7.01  5.48 1.20  YML063W RPS1B   
+ 6 1776927_at    0.00197  0.00000242    6.72  4.95 0.828 YGL147C RPL9A   
+ 7 1773292_at    0.00197  0.00000248    6.69  4.92 0.638 YGR034W RPL26B  
+ 8 1777846_at    0.00197  0.00000337    6.54  4.64 0.672 YBL002W HTB2    
+ 9 1773827_s_at  0.00197  0.00000344    6.53  4.62 0.577 YHL033C RPL8A   
+10 1776763_at    0.00197  0.00000379    6.49  4.53 0.702 YPL256C CLN2    
+# … with 232 more rows
 ```
 
 [5]: Benjamini, Y., & Hochberg, Y. (1995). Controlling the false discovery rate: a practical and powerful approach to multiple testing. Journal of the Royal statistical society: series B (Methodological), 57(1), 289-300.
