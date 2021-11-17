@@ -4,7 +4,6 @@
 # https://github.com/jennybc/here_here#tldr
 
 pval_cutoff <- .05
-lfc_cutoff <- .9
 
 suppressWarnings(suppressPackageStartupMessages(library(docopt)))
 
@@ -304,14 +303,17 @@ log_info("Computing statistics and metrics by empirical Bayes...")
 fit_eb <- eBayes(fit2, robust = TRUE)
 
 log_info("Selecting DE genes...")
-# Grab DE genes with a FDR (Benjamini-Hochberg adjusted p-values),
-# as well as with a absolute log2 fold-change cutoff.
+# Grab DE genes with an FDR (Benjamini-Hochberg adjusted p-values) cutoff.
+# An absolute log2 fold-change cutoff was not used, since
+# if the fold changes and the p-values are not highly correlated,
+# the use of a fold-change cutoff on top of a p-value cutoff
+# can increase the FDR above the nominal level.
+# See limma reference manual.
 de_genes <- topTable(fit_eb,
-    number = 30,
+    number = Inf,
     adjust.method = "BH",
     sort.by = "B",
-    p.value = pval_cutoff,
-    lfc = lfc_cutoff
+    p.value = pval_cutoff
 )
 de_genes <- subset(de_genes,
     select = c(
@@ -355,10 +357,14 @@ if (arguments$feather) {
 
 log_info("Running decideTests...")
 # Identify the significantly differentially expressed genes for each contrast.
+
+# An absolute log2 fold-change cutoff was not used, since
+# if the fold changes and the p-values are not highly correlated,
+# the use of a fold-change cutoff on top of a p-value cutoff
+# can increase the FDR or family-wise error rate above the nominal level.
 results <- decideTests(fit_eb,
     adjust.method = "BH",
     p.value = pval_cutoff,
-    lfc = lfc_cutoff,
     method = "nestedF"
 )
 
@@ -379,6 +385,7 @@ if (arguments$feather) {
     arrow::write_feather(results, here::here(tibbles_dir, tibble_path))
 }
 
+# TODO: no need to call topTable twice.
 full_tt <- topTable(fit_eb,
     adjust.method = "BH",
     sort.by = "B",
@@ -721,14 +728,12 @@ if (arguments$plots) {
         title = "On-ground vs Microgravity",
         subtitle = "Differential Expression",
         caption = bquote(~ Log[2] ~
-        paste("fold change cutoff, ",
-            lfc_cutoff,
-            "; p-value cutoff, ",
+        paste("p-value cutoff, ",
             pval_cutoff,
             sep = ""
         )),
         pCutoff = pval_cutoff,
-        FCcutoff = lfc_cutoff,
+        # FCcutoff = lfc_cutoff,
         pointSize = 1.2,
         labSize = 5.0,
         colAlpha = .8,
