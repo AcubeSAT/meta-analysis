@@ -55,6 +55,7 @@ Coming soon :tm:
   - [Creating the contrast matrix](#creating-the-contrast-matrix)
   - [Empirical Bayes](#empirical-bayes)
   - [Selecting DE genes](#selecting-de-genes)
+    - [decideTests](#decidetests)
 
 </details>
 
@@ -913,3 +914,38 @@ r$> de_genes
 [5]: Benjamini, Y., & Hochberg, Y. (1995). Controlling the false discovery rate: a practical and powerful approach to multiple testing. Journal of the Royal statistical society: series B (Methodological), 57(1), 289-300.
 
 [6]: Benjamini, Y., & Yekutieli, D. (2001). The control of the false discovery rate in multiple testing under dependency. Annals of statistics, 1165-1188.
+
+#### decideTests
+
+`limma` also provides [`limma::decideTests()`](https://www.rdocumentation.org/packages/limma/versions/3.28.14/topics/decideTests). `decideTests` also takes our `fit_eb` `eBayes()` fit and identifies significantly differentially expressed genes:
+
+```r
+results <- decideTests(fit_eb,
+    adjust.method = "BH",
+    p.value = pval_cutoff,
+    method = "nestedF"
+)
+```
+
+A multiple testing procedure and a significance level cutoff is applied to the statistics from `fit_eb` to determine whether each statistic should be considered significantly different from zero.
+
+The Benjamini & Hochberg [5] is also used here to control the FDR.
+The `nestedF` method is selected, which seems to achieve better consistensy between contrasts than the other available methods (first used by [7]). `nestedF` provides formal error rate control at the gene level but not for individual contrasts.
+
+The `nestedF` multiple testing option tests across contrasts for each gene individually, and, when called through `decideTests()`, a multiple testing adjustment across genes is also incorporated.
+A nested F-test approach is used with a focus on correctly classifying genes that have two or more significant t-statistics (i.e. are differentially expressed in two or more conditions). See [`limma:classifyTestsF`](https://rdrr.io/bioc/limma/man/classifytestsF.html) for more.
+
+`decideTests` returns an object that belongs to the `TestResults` class; essentially what is a numeric matrix with elements `-1`, `0`, or `1`, depending on whether each t-statistic is classified as significantly negative, not significant, or significantly positive. We can use `summary()`:
+
+```
+r$> summary(results)
+
+       onground-micro
+Down              122
+NotSig           5416
+Up                120
+```
+
+Again, as is the case with `topTable`, an absolute log2 fold-change cutoff was not used, since if the fold changes and the p-values are not highly correlated, the use of a fold-change cutoff on top of a p-value cutoff can increase the FDR or family-wise error rate above the nominal level.
+
+[7]: Michaud, J., Simpson, K. M., Escher, R., Buchet-Poyau, K., Beissbarth, T., Carmichael, C., ... & Scott, H. S. (2008). Integrative analysis of RUNX1 downstream pathways and target genes. BMC genomics, 9(1), 1-17.
