@@ -864,15 +864,14 @@ de_genes <- topTable(fit_eb,
     number = 30,
     adjust.method = "BH",
     sort.by = "B",
-    p.value = pval_cutoff,
-    lfc = lfc_cutoff
+    p.value = pval_cutoff
 )
 ```
 
 * `adjust.method` sets the method used by [stats::p.adjust()](https://www.rdocumentation.org/packages/stats/versions/3.6.2/topics/p.adjust) to adjust the p-values from `eBayes()`. The commonly used Benjamini & Hochberg [5] method is selected here. The Benjamini & Hochberg method controls the FDR, a less stringent condition than the family-wise error rate, so it's more powerful than the other methods available except Benjamini & Yekutieli [6]
 For an intro to `BH` and `BY` see [these slides](http://www.stat.cmu.edu/~genovese/talks/hannover1-04.pdf) by CMU's Christopher R. Genovese.
 * The criterion used to select the top genes is the B-statistic, the log-odds that the gene is differentially expressed (see `limma`'s [Users Guide](https://bioconductor.org/packages/release/bioc/vignettes/limma/inst/doc/usersguide.pdf))
-* Lastly, we filter our DE genes according to both an adjusted p-value and a log-fold change threshold
+* Lastly, we filter our DE genes according to an adjusted p-value threshold. An absolute log2 fold-change cutoff was not used, since if the fold changes and the p-values are not highly correlated, the use of a fold-change cutoff on top of a p-value cutoff can increase the FDR above the nominal level. See the [limma reference manual](https://bioconductor.org/packages/release/bioc/manuals/limma/man/limma.pdf).
 
 We end up with a `tibble` with a row for each gene considered differentially expressed and with the following columns:
 
