@@ -304,6 +304,9 @@ fit2 <- contrasts.fit(fit, contrast_matrix)
 log_info("Computing statistics and metrics by empirical Bayes...")
 fit_eb <- eBayes(fit2, robust = TRUE)
 
+log_info("eBayes interval null hypothesis (treat)...")
+fit_treat <- treat(fit, fc = 1.1, robust = TRUE)
+
 log_info("Selecting DE genes...")
 # Grab DE genes with an FDR (Benjamini-Hochberg adjusted p-values) cutoff.
 # An absolute log2 fold-change cutoff was not used, since
@@ -312,7 +315,7 @@ log_info("Selecting DE genes...")
 # can increase the FDR above the nominal level.
 # See limma reference manual.
 de_genes <- topTable(fit_eb,
-    number = Inf,
+    number = 30,
     adjust.method = "BH",
     sort.by = "B",
     p.value = pval_cutoff
@@ -325,6 +328,21 @@ de_genes <- subset(de_genes,
         "t",
         "B",
         "logFC",
+        "AveExpr",
+        "ENSEMBL",
+        "GENENAME"
+    )
+)
+
+de_genes_treat <- topTreat(fit_treat)
+de_genes_treat <- subset(de_genes_treat,
+    select = c(
+        "PROBEID",
+        "adj.P.Val",
+        "P.Value",
+        "t",
+        "logFC",
+        "AveExpr",
         "ENSEMBL",
         "GENENAME"
     )
@@ -350,11 +368,15 @@ de_genes <- subset(de_genes,
 # TODO: merge with de_genes
 
 de_genes <- as_tibble(de_genes)
+de_genes_treat <- as_tibble(de_genes_treat)
 
 if (arguments$feather) {
-    log_info("Saving DE genes tibble...")
+    log_info("Saving DE genes tibbles...")
     tibble_path <- "de-genes.feather"
     arrow::write_feather(de_genes, here::here(tibbles_dir, tibble_path))
+
+    tibble_path <- "de-genes-treat.feather"
+    arrow::write_feather(de_genes_treat, here::here(tibbles_dir, tibble_path))
 }
 
 log_info("Running decideTests...")
@@ -720,6 +742,10 @@ if (arguments$plots) {
     coolmap(eset_final[de_genes$PROBEID],
         labRow = de_genes$GENENAME
     )
+    pdf(file = here(plots_dir, "heatmap-treat.pdf"))
+    coolmap(eset_final[de_genes_treat$PROBEID],
+        labRow = de_genes_treat$GENENAME
+    )
     invisible(dev.off())
 
     log_info("Generating EnhancedVolcano...")
@@ -774,6 +800,58 @@ if (arguments$plots) {
         ))
     # Force EnhancedVolcano to return a plot object instead of a ggplot one.
     # Idea from https://github.com/kevinblighe/EnhancedVolcano/issues/3
+    plot(ev)
+
+    log_info("Generating EnhancedVolcano...")
+    pdf(file = here(plots_dir, "p-val-volcano-treat.pdf"))
+    ev <- EnhancedVolcano(full_tt,
+        lab = full_tt$GENENAME,
+        x = "logFC",
+        y = "P.Value",
+        ylab = bquote(~ -Log[10] ~ "  P-value"),
+        ylim = c(0, 8),
+        selectLab = de_genes_treat$GENENAME,
+        title = "On-ground vs Microgravity",
+        subtitle = "Differential Expression",
+        caption = bquote(~ Log[2] ~
+        paste("p-value cutoff, ",
+            pval_cutoff,
+            sep = ""
+        )),
+        pCutoff = pval_cutoff,
+        # FCcutoff = lfc_cutoff,
+        pointSize = 1.2,
+        labSize = 5.0,
+        colAlpha = .8,
+        boxedLabels = TRUE,
+        labCol = "black",
+        labFace = "bold",
+        cutoffLineType = "blank",
+        cutoffLineCol = "black",
+        cutoffLineWidth = .8,
+        hline = c(.05, .005, .0005, .00005),
+        hlineCol = c("black"),
+        hlineType = c("dotted"),
+        gridlines.major = TRUE,
+        gridlines.minor = FALSE,
+        legendLabels = c(
+            "Non-significant",
+            "FC",
+            "P-value",
+            "P-value & FC"
+        ),
+        legendPosition = "bottom",
+        legendLabSize = 14,
+        legendIconSize = 4.0,
+        drawConnectors = TRUE,
+        widthConnectors = .85,
+        colConnectors = "black"
+    )
+    suppressMessages(ev +
+        coord_cartesian(xlim = c(-2.5, 2.5)) +
+        scale_x_continuous(
+            breaks = seq(-2.5, 2.5, .25)
+        ))
     plot(ev)
     invisible(dev.off())
 }
