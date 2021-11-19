@@ -13,15 +13,17 @@ Usage:
   flocculation.R [-q] [--no-color] [--time]
   flocculation.R (-h | --help)
   flocculation.R --version
-  flocculation.R --qc [-r] [-n] [-t] [--plots] [-q] [--no-color] [--feather] [--time]
-  flocculation.R --plots [-q] [--no-color] [--feather] [--time]
-  flocculation.R --feather [--time]
+  flocculation.R [--gsea] [--go] --qc [-r] [-n] [-t] [--plots] [-q] [--no-color] [--feather] [--time]
+  flocculation.R [--gsea] [--go] --plots [-q] [--no-color] [--feather] [--time]
+  flocculation.R [--gsea] [--go] --feather [--time]
 
 Options:
   -h --help     Show this screen.
   --version     Show version.
   --qc          Produce QC reports.
   --plots       Produce DEA plots.
+  --gsea        Perform GSEA
+  --go          Perform GO terms analyses (topgo/kegga/goana)
   --feather     Save result tibbles as (arrow) feather files.
   --time        Output script execution time.
 
@@ -400,229 +402,233 @@ if (arguments$feather) {
     arrow::write_feather(full_tt, here::here(tibbles_dir, tibble_path))
 }
 
-log_info("Generating gene universe...")
-all_genes <- full_tt$adj.P.Val
-names(all_genes) <- full_tt$PROBEID
+if (arguments$gsea) {
+    log_info("Generating gene universe...")
+    all_genes <- full_tt$adj.P.Val
+    names(all_genes) <- full_tt$PROBEID
 
-log_info("Generating BP ID2GO mapping...")
-id_to_go_bp <- get_id_to_go_ontology("BP")
+    log_info("Generating BP ID2GO mapping...")
+    id_to_go_bp <- get_id_to_go_ontology("BP")
 
-log_info("Generating CC ID2GO mapping...")
-id_to_go_cc <- get_id_to_go_ontology("CC")
+    log_info("Generating CC ID2GO mapping...")
+    id_to_go_cc <- get_id_to_go_ontology("CC")
 
-log_info("Generating MF ID2GO mapping...")
-id_to_go_mf <- get_id_to_go_ontology("MF")
+    log_info("Generating MF ID2GO mapping...")
+    id_to_go_mf <- get_id_to_go_ontology("MF")
 
-log_info("Generating the BP topGOdata object...")
-GOdata_bp <- generate_topGOdata("BP", all_genes, id_to_go_bp, pval_cutoff)
+    log_info("Generating the BP topGOdata object...")
+    GOdata_bp <- generate_topGOdata("BP", all_genes, id_to_go_bp, pval_cutoff)
 
-log_info("Generating the CC topGOdata object...")
-GOdata_cc <- generate_topGOdata("CC", all_genes, id_to_go_cc, pval_cutoff)
+    log_info("Generating the CC topGOdata object...")
+    GOdata_cc <- generate_topGOdata("CC", all_genes, id_to_go_cc, pval_cutoff)
 
-log_info("Generating the MF topGOdata object...")
-GOdata_mf <- generate_topGOdata("MF", all_genes, id_to_go_mf, pval_cutoff)
+    log_info("Generating the MF topGOdata object...")
+    GOdata_mf <- generate_topGOdata("MF", all_genes, id_to_go_mf, pval_cutoff)
 
-# NOT adjusted p-values (topGO.pdf, 3.3 Analysis of Results)
-# "The p-values computed by the runTest function are unadjusted for multiple
-# testing. We do not advocate against adjusting the p-values of the tested
-# groups, however in many cases adjusted p-values might be misleading."
-log_info("Running BP Fisher GSEA test...")
-fisher_bp <- suppressMessages(
-    runTest(GOdata_bp, algorithm = "classic", statistic = "fisher")
-)
-log_info("Running BP Kolmogorov-Smirnov GSEA tests...")
-ks_bp <- suppressMessages(
-    runTest(GOdata_bp, algorithm = "classic", statistic = "ks")
-)
-elim_ks_bp <- suppressMessages(
-    runTest(GOdata_bp, algorithm = "elim", statistic = "ks")
-)
+    # NOT adjusted p-values (topGO.pdf, 3.3 Analysis of Results)
+    # "The p-values computed by the runTest function are unadjusted for multiple
+    # testing. We do not advocate against adjusting the p-values of the tested
+    # groups, however in many cases adjusted p-values might be misleading."
+    log_info("Running BP Fisher GSEA test...")
+    fisher_bp <- suppressMessages(
+        runTest(GOdata_bp, algorithm = "classic", statistic = "fisher")
+    )
+    log_info("Running BP Kolmogorov-Smirnov GSEA tests...")
+    ks_bp <- suppressMessages(
+        runTest(GOdata_bp, algorithm = "classic", statistic = "ks")
+    )
+    elim_ks_bp <- suppressMessages(
+        runTest(GOdata_bp, algorithm = "elim", statistic = "ks")
+    )
 
-log_info("Running CC Fisher GSEA test...")
-fisher_cc <- suppressMessages(
-    runTest(GOdata_cc, algorithm = "classic", statistic = "fisher")
-)
-log_info("Running CC Kolmogorov-Smirnov GSEA tests...")
-ks_cc <- suppressMessages(
-    runTest(GOdata_cc, algorithm = "classic", statistic = "ks")
-)
-elim_ks_cc <- suppressMessages(
-    runTest(GOdata_cc, algorithm = "elim", statistic = "ks")
-)
+    log_info("Running CC Fisher GSEA test...")
+    fisher_cc <- suppressMessages(
+        runTest(GOdata_cc, algorithm = "classic", statistic = "fisher")
+    )
+    log_info("Running CC Kolmogorov-Smirnov GSEA tests...")
+    ks_cc <- suppressMessages(
+        runTest(GOdata_cc, algorithm = "classic", statistic = "ks")
+    )
+    elim_ks_cc <- suppressMessages(
+        runTest(GOdata_cc, algorithm = "elim", statistic = "ks")
+    )
 
-log_info("Running MF Fisher GSEA test...")
-fisher_mf <- suppressMessages(
-    runTest(GOdata_mf, algorithm = "classic", statistic = "fisher")
-)
-log_info("Running MF Kolmogorov-Smirnov GSEA tests...")
-ks_mf <- suppressMessages(
-    runTest(GOdata_mf, algorithm = "classic", statistic = "ks")
-)
-elim_ks_mf <- suppressMessages(
-    runTest(GOdata_mf, algorithm = "elim", statistic = "ks")
-)
+    log_info("Running MF Fisher GSEA test...")
+    fisher_mf <- suppressMessages(
+        runTest(GOdata_mf, algorithm = "classic", statistic = "fisher")
+    )
+    log_info("Running MF Kolmogorov-Smirnov GSEA tests...")
+    ks_mf <- suppressMessages(
+        runTest(GOdata_mf, algorithm = "classic", statistic = "ks")
+    )
+    elim_ks_mf <- suppressMessages(
+        runTest(GOdata_mf, algorithm = "elim", statistic = "ks")
+    )
 
-log_info("Gathering BP GSEA results...")
-bp_results <- GenTable(GOdata_bp,
-    classicFisher = fisher_bp,
-    classicKS = ks_bp,
-    elimKS = elim_ks_bp,
-    orderBy = "elimKS",
-    ranksOf = "classicFisher",
-    topNodes = 10
-)
+    log_info("Gathering BP GSEA results...")
+    bp_results <- GenTable(GOdata_bp,
+        classicFisher = fisher_bp,
+        classicKS = ks_bp,
+        elimKS = elim_ks_bp,
+        orderBy = "elimKS",
+        ranksOf = "classicFisher",
+        topNodes = 10
+    )
 
-log_info("Gathering CC GSEA results...")
-cc_results <- GenTable(GOdata_cc,
-    classicFisher = fisher_cc,
-    classicKS = ks_cc,
-    elimKS = elim_ks_cc,
-    orderBy = "elimKS",
-    ranksOf = "classicFisher",
-    topNodes = 10
-)
+    log_info("Gathering CC GSEA results...")
+    cc_results <- GenTable(GOdata_cc,
+        classicFisher = fisher_cc,
+        classicKS = ks_cc,
+        elimKS = elim_ks_cc,
+        orderBy = "elimKS",
+        ranksOf = "classicFisher",
+        topNodes = 10
+    )
 
-log_info("Gathering MF GSEA results...")
-mf_results <- GenTable(GOdata_mf,
-    classicFisher = fisher_mf,
-    classicKS = ks_mf,
-    elimKS = elim_ks_mf,
-    orderBy = "elimKS",
-    ranksOf = "classicFisher",
-    topNodes = 10
-)
+    log_info("Gathering MF GSEA results...")
+    mf_results <- GenTable(GOdata_mf,
+        classicFisher = fisher_mf,
+        classicKS = ks_mf,
+        elimKS = elim_ks_mf,
+        orderBy = "elimKS",
+        ranksOf = "classicFisher",
+        topNodes = 10
+    )
 
-bp_results <- as_tibble(bp_results)
+    bp_results <- as_tibble(bp_results)
 
-if (arguments$feather) {
-    log_info("Saving GSEA BP tibble...")
-    tibble_path <- "gsea_bp.feather"
-    arrow::write_feather(bp_results, here::here(tibbles_dir, tibble_path))
+    if (arguments$feather) {
+        log_info("Saving GSEA BP tibble...")
+        tibble_path <- "gsea_bp.feather"
+        arrow::write_feather(bp_results, here::here(tibbles_dir, tibble_path))
+    }
+
+    cc_results <- as_tibble(cc_results)
+
+    if (arguments$feather) {
+        log_info("Saving GSEA CC tibble...")
+        tibble_path <- "gsea_cc.feather"
+        arrow::write_feather(cc_results, here::here(tibbles_dir, tibble_path))
+    }
+
+    mf_results <- as_tibble(mf_results)
+
+    if (arguments$feather) {
+        log_info("Saving GSEA MF tibble...")
+        tibble_path <- "gsea_mf.feather"
+        arrow::write_feather(mf_results, here::here(tibbles_dir, tibble_path))
+    }
+
+    if (arguments$plots) {
+        log_info("Generating Fisher BP GSEA graph...")
+        plot_gsea(
+            GOdata_bp,
+            score(fisher_bp),
+            5,
+            gsea_dir,
+            "fisher_bp.pdf"
+        )
+
+        log_info("Generating KS BP GSEA graph...")
+        plot_gsea(
+            GOdata_bp,
+            score(ks_bp),
+            5,
+            gsea_dir,
+            "ks_bp.pdf"
+        )
+
+        log_info("Generating Elimination KS BP GSEA graph...")
+        plot_gsea(
+            GOdata_bp,
+            score(elim_ks_bp),
+            5,
+            gsea_dir,
+            "elim_ks_bp.pdf"
+        )
+
+        log_info("Generating Fisher CC GSEA graph...")
+        plot_gsea(
+            GOdata_cc,
+            score(fisher_cc),
+            5,
+            gsea_dir,
+            "fisher_cc.pdf"
+        )
+
+        log_info("Generating KS CC GSEA graph...")
+        plot_gsea(
+            GOdata_cc,
+            score(ks_cc),
+            5,
+            gsea_dir,
+            "ks_cc.pdf"
+        )
+
+        log_info("Generating Elimination KS CC GSEA graph...")
+        plot_gsea(
+            GOdata_cc,
+            score(elim_ks_cc),
+            5,
+            gsea_dir,
+            "elim_ks_cc.pdf"
+        )
+
+        log_info("Generating Fisher MF GSEA graph...")
+        plot_gsea(
+            GOdata_mf,
+            score(fisher_mf),
+            5,
+            gsea_dir,
+            "fisher_mf.pdf"
+        )
+
+        log_info("Generating KS MF GSEA graph...")
+        plot_gsea(
+            GOdata_mf,
+            score(ks_mf),
+            5,
+            gsea_dir,
+            "ks_mf.pdf"
+        )
+
+        log_info("Generating Elimination KS MF GSEA graph...")
+        plot_gsea(
+            GOdata_mf,
+            score(elim_ks_mf),
+            5,
+            gsea_dir,
+            "elim_ks_mf.pdf"
+        )
+    }
 }
 
-cc_results <- as_tibble(cc_results)
+if (arguments$go) {
+    # https://support.bioconductor.org/p/123219/#123228
+    log_info("Linking genes to GO IDs...")
+    gene_to_go_ids <- toTable(yeast2GO2ALLPROBES)
 
-if (arguments$feather) {
-    log_info("Saving GSEA CC tibble...")
-    tibble_path <- "gsea_cc.feather"
-    arrow::write_feather(cc_results, here::here(tibbles_dir, tibble_path))
-}
+    log_info("Linking GO IDs to GO terms...")
+    go_ids_to_terms <- toTable(GOTERM)
+    go_ids_to_terms <- go_ids_to_terms[, c("go_id", "Term")]
 
-mf_results <- as_tibble(mf_results)
-
-if (arguments$feather) {
-    log_info("Saving GSEA MF tibble...")
-    tibble_path <- "gsea_mf.feather"
-    arrow::write_feather(mf_results, here::here(tibbles_dir, tibble_path))
-}
-
-if (arguments$plots) {
-    log_info("Generating Fisher BP GSEA graph...")
-    plot_gsea(
-        GOdata_bp,
-        score(fisher_bp),
-        5,
-        gsea_dir,
-        "fisher_bp.pdf"
+    log_info("Performing over-representation GO analysis...")
+    go_analysis <- kegga(fit_eb,
+        gene.pathway = gene_to_go_ids,
+        pathway.names = go_ids_to_terms
     )
+    log_info("Extracting top GO terms...")
+    top_go_terms <- topKEGG(go_analysis)
+    colnames(top_go_terms)[1] <- "GO Term"
 
-    log_info("Generating KS BP GSEA graph...")
-    plot_gsea(
-        GOdata_bp,
-        score(ks_bp),
-        5,
-        gsea_dir,
-        "ks_bp.pdf"
-    )
+    top_go_terms <- rownames_to_column(top_go_terms, var = "GO ID")
+    top_go_terms <- as_tibble(top_go_terms)
 
-    log_info("Generating Elimination KS BP GSEA graph...")
-    plot_gsea(
-        GOdata_bp,
-        score(elim_ks_bp),
-        5,
-        gsea_dir,
-        "elim_ks_bp.pdf"
-    )
-
-    log_info("Generating Fisher CC GSEA graph...")
-    plot_gsea(
-        GOdata_cc,
-        score(fisher_cc),
-        5,
-        gsea_dir,
-        "fisher_cc.pdf"
-    )
-
-    log_info("Generating KS CC GSEA graph...")
-    plot_gsea(
-        GOdata_cc,
-        score(ks_cc),
-        5,
-        gsea_dir,
-        "ks_cc.pdf"
-    )
-
-    log_info("Generating Elimination KS CC GSEA graph...")
-    plot_gsea(
-        GOdata_cc,
-        score(elim_ks_cc),
-        5,
-        gsea_dir,
-        "elim_ks_cc.pdf"
-    )
-
-    log_info("Generating Fisher MF GSEA graph...")
-    plot_gsea(
-        GOdata_mf,
-        score(fisher_mf),
-        5,
-        gsea_dir,
-        "fisher_mf.pdf"
-    )
-
-    log_info("Generating KS MF GSEA graph...")
-    plot_gsea(
-        GOdata_mf,
-        score(ks_mf),
-        5,
-        gsea_dir,
-        "ks_mf.pdf"
-    )
-
-    log_info("Generating Elimination KS MF GSEA graph...")
-    plot_gsea(
-        GOdata_mf,
-        score(elim_ks_mf),
-        5,
-        gsea_dir,
-        "elim_ks_mf.pdf"
-    )
-}
-
-# https://support.bioconductor.org/p/123219/#123228
-log_info("Linking genes to GO IDs...")
-gene_to_go_ids <- toTable(yeast2GO2ALLPROBES)
-
-log_info("Linking GO IDs to GO terms...")
-go_ids_to_terms <- toTable(GOTERM)
-go_ids_to_terms <- go_ids_to_terms[, c("go_id", "Term")]
-
-log_info("Performing over-representation GO analysis...")
-go_analysis <- kegga(fit_eb,
-    gene.pathway = gene_to_go_ids,
-    pathway.names = go_ids_to_terms
-)
-log_info("Extracting top GO terms...")
-top_go_terms <- topKEGG(go_analysis)
-colnames(top_go_terms)[1] <- "GO Term"
-
-top_go_terms <- rownames_to_column(top_go_terms, var = "GO ID")
-top_go_terms <- as_tibble(top_go_terms)
-
-if (arguments$feather) {
-    log_info("Saving kegga/goana GO terms tibble...")
-    tibble_path <- "kegga-GOTerms.feather"
-    arrow::write_feather(top_go_terms, here::here(tibbles_dir, tibble_path))
+    if (arguments$feather) {
+        log_info("Saving kegga/goana GO terms tibble...")
+        tibble_path <- "kegga-GOTerms.feather"
+        arrow::write_feather(top_go_terms, here::here(tibbles_dir, tibble_path))
+    }
 }
 
 # Histogram of the adjusted p-value distribution
