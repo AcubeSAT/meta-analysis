@@ -27,7 +27,7 @@ Coming soon :tm:
 
 1. `git clone --depth 1 https://gitlab.com/acubesat/su/bioinformatics/meta-analysis.git`
 2. `docker pull xlxs4/meta-analysis:latest`
-3. `docker run -ti -v $PWD/meta-analysis:/meta-analysis xlxs4/meta-analysis`
+3. `docker run -ti --entrypoint /bin/bash -v $PWD/meta-analysis:/meta-analysis xlxs4/meta-analysis`
 4. `cd ../meta-analysis`
 5. `Rscript differential-expression-analysis/src/flocculation.R --qc --plots --feather`
 
