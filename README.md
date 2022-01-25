@@ -16,46 +16,7 @@ Coming soon :tm:
 <details>
 <summary>Click to expand</summary>
 
-- [Description](#description)
-- [Table of Contents](#table-of-contents)
-- [Getting Started](#getting-started)
-  - [TL;DR](#tldr)
-  - [Docker](#docker)
-  - [Grab the Docker image](#grab-the-docker-image)
-  - [Create a container](#create-a-container)
-  - [Start it up](#start-it-up)
-  - [Get in](#get-in)
-  - [Clone the repository](#clone-the-repository)
-  - [Development tips](#development-tips)
-- [Technical](#technical)
-  - [Computational Reproducibility](#computational-reproducibility)
-    - [renv](#renv)
-    - [Docker](#docker-1)
-    - [CI/CD](#cicd)
-  - [Path handling](#path-handling)
-  - [Logging](#logging)
-  - [Tibbles](#tibbles)
-  - [Feather Files](#feather-files)
-  - [NASA GeneLab](#nasa-genelab)
-  - [Original Publication](#original-publication)
-  - [GLDS-62](#glds-62)
-  - [CEL Files](#cel-files)
-  - [Bioconductor](#bioconductor)
-- [Script Rundown](#script-rundown)
-  - [Input](#input)
-  - [Reading in Files](#reading-in-files)
-  - [Helper functions](#helper-functions)
-  - [QC](#qc)
-  - [RMA](#rma)
-  - [Annotation](#annotation)
-  - [Removing probesets](#removing-probesets)
-  - [Selecting representative probes](#selecting-representative-probes)
-  - [Creating the design matrix](#creating-the-design-matrix)
-  - [Fitting the linear models](#fitting-the-linear-models)
-  - [Creating the contrast matrix](#creating-the-contrast-matrix)
-  - [Empirical Bayes](#empirical-bayes)
-  - [Selecting DE genes](#selecting-de-genes)
-    - [decideTests](#decidetests)
+[[_TOC_]]
 
 </details>
 
@@ -64,10 +25,10 @@ Coming soon :tm:
 
 ### TL;DR
 
-1. `docker pull xlxs4/meta-analysis:latest` to grab the image
-2. `docker run -it --entrypoint /bin/bash xlxs4/meta-analysis` to spawn a container running the image and use bash
-3. `git clone --depth 1 https://gitlab.com/acubesat/su/bioinformatics/meta-analysis.git`
-4. `cd meta-analysis`
+1. `git clone --depth 1 https://gitlab.com/acubesat/su/bioinformatics/meta-analysis.git`
+2. `docker pull xlxs4/meta-analysis:latest`
+3. `docker run -ti -v $PWD/meta-analysis:/meta-analysis xlxs4/meta-analysis`
+4. `cd ../meta-analysis`
 5. `Rscript differential-expression-analysis/src/flocculation.R --qc --plots --feather`
 
 ### Docker
@@ -82,11 +43,18 @@ In that case, get [Windows Terminal](https://aka.ms/terminal)
 * You can pull the image straight from the cloud: `docker pull xlxs4/meta-analysis:latest`
 * ...  or you can build it yourself (something like `docker build -t meta-analysis .`)
 
+
+### Clone the repository
+
+* `Explorer` (`Ctrl + Shift + E`) -> `Clone Repository` [:camera:](https://prnt.sc/1bu52pf)
+* Clone the `meta-analysis` repository [:camera:](https://prnt.sc/1bu5ttp)  [:camera:](https://prnt.sc/1bu602g)
+* Open the cloned repository [:camera:](https://prnt.sc/1bu63we)  [:camera:](https://prnt.sc/1bu6990)
+* :bulb: Hint: click on a :camera: when you find one
+
 ### Create a container
 
-* `docker run -i -t xlxs4/meta-analysis:latest /bin /bash` 
+* `docker run -ti -v $PWD/meta-analysis:/meta-analysis xlxs4/meta-analysis` 
 * `Ctrl + d` to exit. [:camera:](https://prnt.sc/1bu4lcr) [:camera:](https://prnt.sc/1bu4p8s)
-*  :bulb: Hint: click on a :camera: when you find one
 
 ### Start it up
 
@@ -101,18 +69,13 @@ In that case, get [Windows Terminal](https://aka.ms/terminal)
 
 * `Open a Remote Window` [:camera:](https://prnt.sc/1btzqbd) -> `Attach to Container` [:camera:](https://prnt.sc/1btzy1h) -> <container_hash> [:camera:](https://prnt.sc/1bu0ffu)
 
-### Clone the repository
-
-* `Explorer` (`Ctrl + Shift + E`) -> `Clone Repository` [:camera:](https://prnt.sc/1bu52pf)
-* Clone the `meta-analysis` repository [:camera:](https://prnt.sc/1bu5ttp)  [:camera:](https://prnt.sc/1bu602g)
-* Open the cloned repository [:camera:](https://prnt.sc/1bu63we)  [:camera:](https://prnt.sc/1bu6990)
-
 ### Development tips
 
 * Installing `python-pip3` and using it to install [`radian`](https://github.com/randy3k/radian) inside the container is highly recommended
 * If you want to update the image, e.g. for CI/CD purposes, but have made the changes to the `renv` lockfile inside an attached running Docker container, you can `git clone` the repository in your main working environment, and then grab the updated `renv.lock` file, like this: `docker cp <container_name>:"<path_to_renv.lock>" .`
   Then, just do `docker build -t meta-analysis .`, `docker image tag meta-analysis:latest <repo_name>/meta-analysis:latest` and `docker push <repo_name>/meta-analysis:latest`
 * [`conflicted`](https://www.tidyverse.org/blog/2018/06/conflicted/) is a great `tidyverse` package to check for conflicts arising from ambiguous function names. From within the container, open the R terminal (e.g. `radian`), and `install.packages("conflicted")`. Then, you can just load it (`library(conflicted)`) in the running session. To re-check for conflicts, simply run `conflicted::conflict_scout()`
+* Since you mounted the volume, any changes you do in `meta-analysis` while inside the container will persist in the host directory even after closing the container. This is bidirectional: you can keep updating the `meta-analysis` directory from outside, and the changes will be immediately reflected inside the container. You can also work inside the container, and sign your commits with `git commit -S` out of the box!
 
 ## Technical
 
@@ -949,3 +912,20 @@ Up                120
 Again, as is the case with `topTable`, an absolute log2 fold-change cutoff was not used, since if the fold changes and the p-values are not highly correlated, the use of a fold-change cutoff on top of a p-value cutoff can increase the FDR or family-wise error rate above the nominal level.
 
 [7]: Michaud, J., Simpson, K. M., Escher, R., Buchet-Poyau, K., Beissbarth, T., Carmichael, C., ... & Scott, H. S. (2008). Integrative analysis of RUNX1 downstream pathways and target genes. BMC genomics, 9(1), 1-17.
+
+#### topTreat
+
+Because we would like to also run the analysis using fold change thresholding, we also use `treat` instead of `eBayes`:
+```r
+fit_treat <- treat(fit, fc = 1.1, robust = TRUE)
+```
+
+From the `limma` reference guide:
+> treat computes empirical Bayes moderated-t p-values relative to a minimum fold-change threshold. Instead of testing for genes that have true log-fold-changes different from zero, it tests whether the true log2-fold-change is greater than lfc in absolute value [8]. In other words, it uses an interval null hypothesis, where the interval is [-lfc,lfc]. When the number of DE genes is large, treat is often useful for giving preference to larger fold-changes and for prioritizing genes that are biologically important. treat is concerned with p-values rather than posterior odds, so it does not compute the B-statistic lods. The idea of thresholding doesn’t apply to F-statistics in a straightforward way, so moderated F-statistics are also not computed. When fc=1 and lfc=0, treat is identical to eBayes, except that F-statistics and B-statistics are not computed. The fc threshold is usually chosen relatively small, because genes need to have fold changes substantially greater than the testing threshold in order to be considered statistically significant. Typical values for fc are 1.1, 1.2 or 1.5.
+
+Now all we have to do is use `topTreat` instead of `topTable` to summarize the linear fit produced by `lmfit` and processed by `treat`:
+```r
+de_genes_treat <- topTreat(fit_treat)
+```
+
+[8]: McCarthy, D. J., & Smyth, G. K. (2009). Testing significance relative to a fold-change threshold is a TREAT. Bioinformatics, 25(6), 765-771.
