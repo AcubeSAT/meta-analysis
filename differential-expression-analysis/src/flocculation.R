@@ -386,27 +386,39 @@ log_info("Running decideTests...")
 # if the fold changes and the p-values are not highly correlated,
 # the use of a fold-change cutoff on top of a p-value cutoff
 # can increase the FDR or family-wise error rate above the nominal level.
-results <- decideTests(fit_eb,
+results_ebayes <- decideTests(fit_eb,
     adjust.method = "BH",
     p.value = pval_cutoff,
     method = "nestedF"
 )
+results_treat <- decideTests(fit_treat,
+    adjust.method = "BH",
+    method="nestedF"
+)
 
 if (arguments$qc || arguments$plots) {
     # Venn diagram needs TestResults-class.
-    results_dt <- results
+    results_ebayes_dt <- results_ebayes
+    results_treat_dt <- results_treat
 }
 # tibble gets all confused with the TestResults-class...
-results <- as.data.frame(results)
+results_ebayes <- as.data.frame(results_ebayes)
+results_treat <- as.data.frame(results_treat)
 # tibble also won't preserve rownames.
 # https://tibble.tidyverse.org/reference/rownames.html
-results <- rownames_to_column(results, var = "probe_id")
-results <- as_tibble(results)
+results_ebayes <- rownames_to_column(results_ebayes, var = "probe_id")
+results_ebayes <- as_tibble(results_ebayes)
+
+results_treat <- rownames_to_column(results_treat, var = "probe_id")
+results_treat <- as_tibble(results_treat)
 
 if (arguments$feather) {
-    log_info("Saving decideTests results tibble...")
-    tibble_path <- "decideTests.feather"
-    arrow::write_feather(results, here::here(tibbles_dir, tibble_path))
+    log_info("Saving decideTests results tibbles...")
+    tibble_path_ebayes <- "decideTests-eBayes.feather"
+    tibble_path_treat <- "decideTests-treat.feather"
+
+    arrow::write_feather(results_ebayes, here::here(tibbles_dir, tibble_path_ebayes))
+    arrow::write_feather(results_treat, here::here(tibbles_dir, tibble_path_treat))
 }
 
 # TODO: no need to call topTable twice.
@@ -521,7 +533,7 @@ if (arguments$gsea) {
 
     if (arguments$feather) {
         log_info("Saving GSEA BP tibble...")
-        tibble_path <- "gsea_bp.feather"
+        tibble_path <- "gsea-bp.feather"
         arrow::write_feather(bp_results, here::here(tibbles_dir, tibble_path))
     }
 
@@ -529,7 +541,7 @@ if (arguments$gsea) {
 
     if (arguments$feather) {
         log_info("Saving GSEA CC tibble...")
-        tibble_path <- "gsea_cc.feather"
+        tibble_path <- "gsea-cc.feather"
         arrow::write_feather(cc_results, here::here(tibbles_dir, tibble_path))
     }
 
@@ -537,7 +549,7 @@ if (arguments$gsea) {
 
     if (arguments$feather) {
         log_info("Saving GSEA MF tibble...")
-        tibble_path <- "gsea_mf.feather"
+        tibble_path <- "gsea-mf.feather"
         arrow::write_feather(mf_results, here::here(tibbles_dir, tibble_path))
     }
 
@@ -700,6 +712,7 @@ if (arguments$qc) {
     }
 }
 
+# TODO: generate for the treat() results too!
 if (arguments$plots) {
     ct <- 1
     log_info("Generating volcanoplot...")
@@ -708,7 +721,7 @@ if (arguments$plots) {
         coef = ct,
         main = colnames(fit_eb)[ct],
         pch = 20,
-        highlight = length(which(results_dt[, ct] != 0)),
+        highlight = length(which(results_ebayes_dt[, ct] != 0)),
         names = rep("+", nrow(fit_eb))
     )
     invisible(dev.off())
@@ -719,7 +732,7 @@ if (arguments$plots) {
     pdf(file = here(plots_dir, "MD.pdf"))
     plotMD(fit_eb,
         column = ct,
-        status = results_dt[, ct],
+        status = results_ebayes_dt[, ct],
         legend = F,
         pch = 20,
         cex = 1
@@ -729,7 +742,7 @@ if (arguments$plots) {
 
     log_info("Generating Venn diagram...")
     pdf(file = here(plots_dir, "venn.pdf"))
-    vennDiagram(results_dt, circle.col = palette())
+    vennDiagram(results_ebayes_dt, circle.col = palette())
     invisible(dev.off())
 
     # Generate heatmap where genes are clustered
