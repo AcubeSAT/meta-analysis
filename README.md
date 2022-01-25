@@ -25,10 +25,10 @@ Coming soon :tm:
 
 ### TL;DR
 
-1. `docker pull xlxs4/meta-analysis:latest` to grab the image
-2. `docker run -it --entrypoint /bin/bash xlxs4/meta-analysis` to spawn a container running the image and use bash
-3. `git clone --depth 1 https://gitlab.com/acubesat/su/bioinformatics/meta-analysis.git`
-4. `cd meta-analysis`
+1. `git clone --depth 1 https://gitlab.com/acubesat/su/bioinformatics/meta-analysis.git`
+2. `docker pull xlxs4/meta-analysis:latest`
+3. `docker run -ti -v $PWD/meta-analysis:/meta-analysis xlxs4/meta-analysis`
+4. `cd ../meta-analysis`
 5. `Rscript differential-expression-analysis/src/flocculation.R --qc --plots --feather`
 
 ### Docker
@@ -43,11 +43,18 @@ In that case, get [Windows Terminal](https://aka.ms/terminal)
 * You can pull the image straight from the cloud: `docker pull xlxs4/meta-analysis:latest`
 * ...  or you can build it yourself (something like `docker build -t meta-analysis .`)
 
+
+### Clone the repository
+
+* `Explorer` (`Ctrl + Shift + E`) -> `Clone Repository` [:camera:](https://prnt.sc/1bu52pf)
+* Clone the `meta-analysis` repository [:camera:](https://prnt.sc/1bu5ttp)  [:camera:](https://prnt.sc/1bu602g)
+* Open the cloned repository [:camera:](https://prnt.sc/1bu63we)  [:camera:](https://prnt.sc/1bu6990)
+* :bulb: Hint: click on a :camera: when you find one
+
 ### Create a container
 
-* `docker run -i -t xlxs4/meta-analysis:latest /bin /bash` 
+* `docker run -ti -v $PWD/meta-analysis:/meta-analysis xlxs4/meta-analysis` 
 * `Ctrl + d` to exit. [:camera:](https://prnt.sc/1bu4lcr) [:camera:](https://prnt.sc/1bu4p8s)
-*  :bulb: Hint: click on a :camera: when you find one
 
 ### Start it up
 
@@ -62,18 +69,13 @@ In that case, get [Windows Terminal](https://aka.ms/terminal)
 
 * `Open a Remote Window` [:camera:](https://prnt.sc/1btzqbd) -> `Attach to Container` [:camera:](https://prnt.sc/1btzy1h) -> <container_hash> [:camera:](https://prnt.sc/1bu0ffu)
 
-### Clone the repository
-
-* `Explorer` (`Ctrl + Shift + E`) -> `Clone Repository` [:camera:](https://prnt.sc/1bu52pf)
-* Clone the `meta-analysis` repository [:camera:](https://prnt.sc/1bu5ttp)  [:camera:](https://prnt.sc/1bu602g)
-* Open the cloned repository [:camera:](https://prnt.sc/1bu63we)  [:camera:](https://prnt.sc/1bu6990)
-
 ### Development tips
 
 * Installing `python-pip3` and using it to install [`radian`](https://github.com/randy3k/radian) inside the container is highly recommended
 * If you want to update the image, e.g. for CI/CD purposes, but have made the changes to the `renv` lockfile inside an attached running Docker container, you can `git clone` the repository in your main working environment, and then grab the updated `renv.lock` file, like this: `docker cp <container_name>:"<path_to_renv.lock>" .`
   Then, just do `docker build -t meta-analysis .`, `docker image tag meta-analysis:latest <repo_name>/meta-analysis:latest` and `docker push <repo_name>/meta-analysis:latest`
 * [`conflicted`](https://www.tidyverse.org/blog/2018/06/conflicted/) is a great `tidyverse` package to check for conflicts arising from ambiguous function names. From within the container, open the R terminal (e.g. `radian`), and `install.packages("conflicted")`. Then, you can just load it (`library(conflicted)`) in the running session. To re-check for conflicts, simply run `conflicted::conflict_scout()`
+* Since you mounted the volume, any changes you do in `meta-analysis` while inside the container will persist in the host directory even after closing the container. This is bidirectional: you can keep updating the `meta-analysis` directory from outside, and the changes will be immediately reflected inside the container. You can also work inside the container, and sign your commits with `git commit -S` out of the box!
 
 ## Technical
 
