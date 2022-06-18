@@ -30,8 +30,8 @@ Coming soon :tm:
 |ARP5|P53946|Actin-related protein 5 (Actin-like protein ARP5)|1|simulation|1.23|0.30|
 |ARP8|Q12386|Actin-like protein ARP8|1|space|KO affected yeast survival|-|
 |ASF1|P32447|Histone chaperone ASF1 (Anti-silencing function protein 1) (yASF1)|1|simulation|0.63|-0.67|
-|ATP2|P00830|"ATP synthase subunit beta| mitochondrial (EC 7.1.2.2)"|1|space|0.40|-1.32|
-|ATP4|P05626|"ATP synthase subunit 4| mitochondrial"|1|space|KO affected yeast survival|-|
+|ATP2|P00830|"ATP synthase subunit beta \| mitochondrial (EC 7.1.2.2)"|1|space|0.40|-1.32|
+|ATP4|P05626|"ATP synthase subunit 4 \| mitochondrial"|1|space|KO affected yeast survival|-|
 |AXL1|P40851|Putative protease AXL1 (EC 3.4.24.-)|1|simulation|1.10|0.14|
 |AXL2|P38928|Axial budding pattern protein 2 (Bud site selection protein 10) (Suppressor of RHO3 protein 4)|1|simulation|1.40|0.49|
 |BDF1|P35817|Bromodomain-containing factor 1|1|simulation|1.52|0.60|
@@ -65,7 +65,7 @@ Coming soon :tm:
 |CDC19|P00549|Pyruvate kinase 1 (PK 1) (EC 2.7.1.40) (cell division cycle protein 19)|1|simulation|2.07|1.05|
 |CDC73|Q06697|Cell division control protein 73 (RNA polymerase-associated protein CDC73)|1|simulation|0.81|-0.30|
 |CHL4|P38907|Inner kinetochore subunit CHL4 (CENP-N homolog) (Chromosome loss protein 4) (Chromosome transmission fidelity protein 17) (Constitutive centromere-associated network protein CHL4) (Minichromosome maintenance protein 17)|1|simulation|1.60|0.68|
-|CIT1|P00890|"Citrate synthase| mitochondrial (EC 2.3.3.1)"|1|simulation|0.43|-1.22|
+|CIT1|P00890|"Citrate synthase \| mitochondrial (EC 2.3.3.1)"|1|simulation|0.43|-1.22|
 |CLA4|P48562|Serine/threonine-protein kinase CLA4 (EC 2.7.11.1)|1|simulation|0.81|-0.30|
 |CTF3|Q12748|Inner kinetochore subunit CTF3 (CENP-I homolog) (Chromosome loss protein 3) (Chromosome transmission fidelity protein 3) (Constitutive centromere-associated network protein CTF3)|1|simulation|0.87|-0.21|
 |CTK1|Q03957|CTD kinase subunit alpha (CTDK-I subunit alpha) (EC 2.7.11.23) (CTD kinase 58 kDa subunit) (CTD kinase subunit 1)|1|simulation|1.30|0.38|
@@ -80,11 +80,11 @@ Coming soon :tm:
 |EDC3|P39998|Enhancer of mRNA-decapping protein 3|1|simulation|0.74|-0.44|
 |EGT2|P42835|Protein EGT2 (Early G1 transcript 2)|2|simulation|6.10|2.61|
 |ELP2|P42935|Elongator complex protein 2 (Gamma-toxin target 2)|1|space|KO affected yeast survival|-|
-|FBA1|P14540|"Fructose-bisphosphate aldolase (FBP aldolase) (FBPA) (EC 4.1.2.13) (Fructose-1|6-bisphosphate aldolase)"|2|space|0.45|-1.15|
-|FMP16|Q12497|"Protein FMP16| mitochondrial (Found in mitochondrial proteome protein 16)"|1|simulation|3.36|1.75|
+|FBA1|P14540|"Fructose-bisphosphate aldolase (FBP aldolase) (FBPA) (EC 4.1.2.13) (Fructose-1\|6-bisphosphate aldolase)"|2|space|0.45|-1.15|
+|FMP16|Q12497|"Protein FMP16 \| mitochondrial (Found in mitochondrial proteome protein 16)"|1|simulation|3.36|1.75|
 |FPR2|P32472|Peptidyl-prolyl cis-trans isomerase FPR2 (PPIase FPR2) (EC 5.2.1.8) (FK506-binding protein 2) (FKBP proline rotamase 2) (FKBP-13) (FKBP-15)|1|space|KO affected yeast survival|-|
 |FUS3|P16892|Mitogen-activated protein kinase FUS3 (MAP kinase FUS3) (EC 2.7.11.24)|1|simulation|1.58|0.66|
-|GAS1|P22146|"1|3-beta-glucanosyltransferase GAS1 (EC 2.4.1.-) (Glycolipid-anchored surface protein 1) (Glycoprotein GP115)"|1|simulation|2.00|1.00|
+|GAS1|P22146|"1\|3-beta-glucanosyltransferase GAS1 (EC 2.4.1.-) (Glycolipid-anchored surface protein 1) (Glycoprotein GP115)"|1|simulation|2.00|1.00|
 |GIM3|P53900|Prefoldin subunit 4 (Genes involved in microtubule biogenesis protein 3) (Gim complex subunit 3) (GimC subunit 3)|1|simulation|1.17|0.23|
 |GPX1|P36014|Glutathione peroxidase-like peroxiredoxin 1 (EC 1.11.1.24) (EC 1.11.1.9) (Glutathione peroxidase homolog 1) (GPx 1)|1|space|0.52|-0.94|
 |HCR1|Q05775|Eukaryotic translation initiation factor 3 subunit J (eIF3j) (Eukaryotic translation initiation factor 3 30 kDa subunit) (eIF-3 30 kDa)|1|space|KO affected yeast survival|-|
@@ -98,7 +98,7 @@ Coming soon :tm:
 |HSP12|P22943|12 kDa heat shock protein (Glucose and lipid-regulated protein)|1|simulation|5.19|2.38|
 |HTL1|Q9URQ5|High temperature lethal protein 1 (Chromatin structure-remodeling complex protein HTL1)|1|simulation|1.50|0.59|
 |HUG1|Q6Q5K6|MEC1-mediated checkpoint protein HUG1|1|simulation|8.87|3.15|
-|IDH2|P28241|"Isocitrate dehydrogenase [NAD] subunit 2| mitochondrial (EC 1.1.1.41) (Isocitric dehydrogenase) (NAD(+)-specific ICDH)"|2|space|0.49|-1.03|
+|IDH2|P28241|"Isocitrate dehydrogenase \[NAD\] subunit 2 \| mitochondrial (EC 1.1.1.41) (Isocitric dehydrogenase) (NAD(+)-specific ICDH)"|2|space|0.49|-1.03|
 |IES4|Q08561|Ino eighty subunit 4|1|space|KO affected yeast survival|-|
 |IPP1|P00817|Inorganic pyrophosphatase (EC 3.6.1.1) (Pyrophosphate phospho-hydrolase) (PPase)|1|space|0.44|-1.18|
 |IWR1|Q07532|RNA polymerase II nuclear localization protein IWR1 (Interacting with RNA polymerase II protein 1)|1|simulation|1.67|0.74|
@@ -111,8 +111,8 @@ Coming soon :tm:
 |MDM31|P38880|Mitochondrial distribution and morphology protein 31|1|space|KO affected yeast survival|-|
 |MDY2|Q12285|Ubiquitin-like protein MDY2 (Golgi to ER traffic protein 5) (Mating-deficient protein 2) (Translation machinery-associated protein 24)|1|simulation|1.63|0.70|
 |MMM1|P41800|Maintenance of mitochondrial morphology protein 1 (Mitochondrial outer membrane protein MMM1) (Yeast mitochondrial escape protein 6)|1|space|KO affected yeast survival|-|
-|MRP51|Q02950|"37S ribosomal protein MRP51| mitochondrial (Mitochondrial small ribosomal subunit protein bS1m)"|1|space|KO affected yeast survival|-|
-|MRPL8|P22353|"54S ribosomal protein L8| mitochondrial (Mitochondrial large ribosomal subunit protein bL17m) (YmL8)"|1|space|KO affected yeast survival|-|
+|MRP51|Q02950|"37S ribosomal protein MRP51 \| mitochondrial (Mitochondrial small ribosomal subunit protein bS1m)"|1|space|KO affected yeast survival|-|
+|MRPL8|P22353|"54S ribosomal protein L8 \| mitochondrial (Mitochondrial large ribosomal subunit protein bL17m) (YmL8)"|1|space|KO affected yeast survival|-|
 |MSI1|P13712|Chromatin assembly factor 1 subunit p50 (CAF-1 p50 subunit) (IRA1 multicopy suppressor) (Protein MSI1)|1|simulation|0.86|-0.21|
 |MSN5|P52918|Protein MSN5|1|simulation|0.92|-0.11|
 |NEW1|Q08972|[NU+] prion formation protein 1|1|simulation|0.67|-0.58|
@@ -131,10 +131,10 @@ Coming soon :tm:
 |PHO85|P17157|Cyclin-dependent protein kinase PHO85 (EC 2.7.11.22) (Negative regulator of the PHO system) (Serine/threonine-protein kinase PHO85)|1|simulation|1.04|0.06|
 |POM34|Q12445|Nucleoporin POM34 (Nuclear pore protein POM34) (Pore membrane protein POM34)|1|simulation|0.98|-0.03|
 |POP2|P39008|Poly(A) ribonuclease POP2 (EC 3.1.13.4) (CCR4-associated factor 1)|1|simulation|0.79|-0.35|
-|PPA2|P28239|"Inorganic pyrophosphatase| mitochondrial (EC 3.6.1.1) (Pyrophosphate phospho-hydrolase) (PPase)"|1|space|KO affected yeast survival|-|
+|PPA2|P28239|"Inorganic pyrophosphatase \| mitochondrial (EC 3.6.1.1) (Pyrophosphate phospho-hydrolase) (PPase)"|1|space|KO affected yeast survival|-|
 |PRS3|P23724|Proteasome subunit beta type-6 (Multicatalytic endopeptidase complex subunit C5) (Proteasome component C5)|1|simulation|2.00|1.00|
 |PSP1|P50896|Protein PSP1 (Growth inhibitory protein 5) (Polymerase suppressor protein 1)|1|simulation|1.33|0.41|
-|QCR8|P08525|"Cytochrome b-c1 complex subunit 8| mitochondrial (Complex III subunit 8) (Complex III subunit VII) (Ubiquinol-cytochrome c oxidoreductase subunit 8) (Ubiquinol-cytochrome c reductase complex 11 kDa protein) (Ubiquinone-binding protein QP-C)"|1|space|KO affected yeast survival |-|
+|QCR8|P08525|"Cytochrome b-c1 complex subunit 8 \| mitochondrial (Complex III subunit 8) (Complex III subunit VII) (Ubiquinol-cytochrome c oxidoreductase subunit 8) (Ubiquinol-cytochrome c reductase complex 11 kDa protein) (Ubiquinone-binding protein QP-C)"|1|space|KO affected yeast survival |-|
 |RAD27|P26793|Flap endonuclease 1 (FEN-1) (EC 3.1.-.-) (Flap structure-specific endonuclease 1) (RAD2 homolog nuclease 1) (RTH1 nuclease) (Structure-specific endonuclease RAD27)|1|space|KO affected yeast survival |-|
 |RAD51|P25454|DNA repair protein RAD51|2|space|KO affected yeast survival |-|
 |RAD52|P06778|DNA repair and recombination protein RAD52|1|simulation|1.09|0.13|
@@ -142,7 +142,7 @@ Coming soon :tm:
 |RAD57|P25301|DNA repair protein RAD57|1|simulation|1.20|0.27|
 |RAD6|P06104|Ubiquitin-conjugating enzyme E2 2 (EC 2.3.2.23) (E2 ubiquitin-conjugating enzyme 2) (Radiation sensitivity protein 6) (Ubiquitin carrier protein UBC2) (Ubiquitin-protein ligase UBC2)|1|simulation|1.64|0.72|
 |RAX2|Q12465|Bud site selection protein RAX2 (Revert to axial protein 2)|2|simulation|3.40|1.77|
-|RML2|P32611|"54S ribosomal protein RML2| mitochondrial (L2) (Mitochondrial large ribosomal subunit protein uL2m)"|1|space|KO affected yeast survival|-|
+|RML2|P32611|"54S ribosomal protein RML2 \| mitochondrial (L2) (Mitochondrial large ribosomal subunit protein uL2m)"|1|space|KO affected yeast survival|-|
 |RNR2|P09938|Ribonucleoside-diphosphate reductase small chain 1 (EC 1.17.4.1) (Ribonucleotide reductase R2 subunit 1) (Ribonucleotide reductase small subunit 1)|1|simulation|5.42|2.44|
 |RNR4|P49723|Ribonucleoside-diphosphate reductase small chain 2 (EC 1.17.4.1) (Ribonucleotide reductase R2 subunit 2) (Ribonucleotide reductase small subunit 2)|1|simulation|6.49|2.70|
 |RPA49|Q01080|DNA-directed RNA polymerase I subunit RPA49 (A49) (DNA-directed RNA polymerase I 49 kDa polypeptide)|1|simulation|0.38|-1.39|
@@ -152,7 +152,7 @@ Coming soon :tm:
 |RPL22A|P05749|60S ribosomal protein L22-A (L1c) (Large ribosomal subunit protein eL22-A) (RP4) (YL31)|1|simulation|4.40|2.14|
 |RPL29|P05747|60S ribosomal protein L29 (Large ribosomal subunit protein eL29) (YL43)|1|space|KO affected yeast survival|-|
 |RPL37A|P05744|60S ribosomal protein L33-A (L37) (Large ribosomal subunit protein eL33-A) (RP47) (YL37)|1|space|KO affected yeast survival|-|
-|RPO41|P13433|"DNA-directed RNA polymerase| mitochondrial (EC 2.7.7.6)"|1|space|KO affected yeast survival|-|
+|RPO41|P13433|"DNA-directed RNA polymerase \| mitochondrial (EC 2.7.7.6)"|1|space|KO affected yeast survival|-|
 |RPP1A|P05318|60S acidic ribosomal protein P1-alpha (A1) (L12eIIA) (Large ribosomal subunit protein P1-A) (P1A) (YP1alpha)|1|space|KO affected yeast survival|-|
 |RPS10B|P0CX37|40S ribosomal protein S6-A (RP9) (S10) (Small ribosomal subunit protein eS6-A) (YS4)|1|space|KO affected yeast survival|-|
 |RPS11B|P0CX48|40S ribosomal protein S11-B (RP41) (S18) (Small ribosomal subunit protein uS17-B) (YS12)|1|space|KO affected yeast survival |-|
@@ -162,7 +162,7 @@ Coming soon :tm:
 |RPS30A|P0CX33|40S ribosomal protein S30-A (Small ribosomal subunit protein eS30-A)|1|simulation|1.01|0.01|
 |RSC2|Q06488|Chromatin structure-remodeling complex subunit RSC2 (RSC complex subunit RSC2) (Remodel the structure of chromatin complex subunit 2)|1|simulation|0.91|-0.14|
 |RSR1|P13856|Ras-related protein RSR1 (EC 3.6.5.2)|2|simulation|2.00|1.00|
-|RTS1|P38903|"Serine/threonine-protein phosphatase 2A 56 kDa regulatory subunit delta isoform (PP2A| B subunit| B' delta isoform) (Protein RTS1) (Protein SCS1)"|1|simulation|1.51|0.59|
+|RTS1|P38903|"Serine/threonine-protein phosphatase 2A 56 kDa regulatory subunit delta isoform (PP2A| B subunit \| B' delta isoform) (Protein RTS1) (Protein SCS1)"|1|simulation|1.51|0.59|
 |RTT106|P40161|Histone chaperone RTT106 (Regulator of Ty1 transposition protein 106)|1|simulation|0.89|-0.16|
 |SAC3|P46674|Nuclear mRNA export protein SAC3 (Leucine permease transcriptional regulator)|1|simulation|0.88|-0.19|
 |SCP160|P06105|Protein SCP160 (Protein HX)|1|simulation|0.60|-0.75|
@@ -175,7 +175,7 @@ Coming soon :tm:
 |SLG1|P54867|Protein SLG1 (Cell wall integrity and stress response component 1) (Synthetic lethal with GAP protein 1)|2|space|KO affected yeast survival|-|
 |SLX9|P53251|Ribosome biogenesis protein SLX9|1|space|KO affected yeast survival|-|
 |SMY2|P32909|Protein SMY2 (Suppressor of MYO2-66 protein)|1|simulation|0.69|-0.53|
-|SOD2|P00447|"Superoxide dismutase [Mn]| mitochondrial (EC 1.15.1.1)"|1|space|0.40|-1.32|
+|SOD2|P00447|"Superoxide dismutase \[Mn\] \| mitochondrial (EC 1.15.1.1)"|1|space|0.40|-1.32|
 |SPC72|P39723|Spindle pole component SPC72|1|simulation|1.35|0.43|
 |SPF1|P39986|Endoplasmic reticulum transmembrane helix translocase (EC 7.4.2.-) (Complexed with DOR1 protein 1) (Endoplasmic reticulum P5A-ATPase) (Sensitivity to the P.farinosa killer toxin protein 1)|1|space|KO affected yeast survival|-|
 |SPI1|P40092|Uncharacterized cell wall protein SPI1 (Stationary phase-induced protein 1)|1|simulation|4.34|2.12|
