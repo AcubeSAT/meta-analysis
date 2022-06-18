@@ -162,7 +162,7 @@ Coming soon :tm:
 |RPS30A|P0CX33|40S ribosomal protein S30-A (Small ribosomal subunit protein eS30-A)|1|simulation|1.01|0.01|
 |RSC2|Q06488|Chromatin structure-remodeling complex subunit RSC2 (RSC complex subunit RSC2) (Remodel the structure of chromatin complex subunit 2)|1|simulation|0.91|-0.14|
 |RSR1|P13856|Ras-related protein RSR1 (EC 3.6.5.2)|2|simulation|2.00|1.00|
-|RTS1|P38903|"Serine/threonine-protein phosphatase 2A 56 kDa regulatory subunit delta isoform (PP2A| B subunit \| B' delta isoform) (Protein RTS1) (Protein SCS1)"|1|simulation|1.51|0.59|
+|RTS1|P38903|"Serine/threonine-protein phosphatase 2A 56 kDa regulatory subunit delta isoform (PP2A \| B subunit \| B' delta isoform) (Protein RTS1) (Protein SCS1)"|1|simulation|1.51|0.59|
 |RTT106|P40161|Histone chaperone RTT106 (Regulator of Ty1 transposition protein 106)|1|simulation|0.89|-0.16|
 |SAC3|P46674|Nuclear mRNA export protein SAC3 (Leucine permease transcriptional regulator)|1|simulation|0.88|-0.19|
 |SCP160|P06105|Protein SCP160 (Protein HX)|1|simulation|0.60|-0.75|
