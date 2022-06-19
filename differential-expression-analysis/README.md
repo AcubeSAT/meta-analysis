@@ -77,6 +77,62 @@ In that case, get [Windows Terminal](https://aka.ms/terminal)
 * [`conflicted`](https://www.tidyverse.org/blog/2018/06/conflicted/) is a great `tidyverse` package to check for conflicts arising from ambiguous function names. From within the container, open the R terminal (e.g. `radian`), and `install.packages("conflicted")`. Then, you can just load it (`library(conflicted)`) in the running session. To re-check for conflicts, simply run `conflicted::conflict_scout()`
 * Since you mounted the volume, any changes you do in `meta-analysis` while inside the container will persist in the host directory even after closing the container. This is bidirectional: you can keep updating the `meta-analysis` directory from outside, and the changes will be immediately reflected inside the container. You can also work inside the container, and sign your commits with `git commit -S` out of the box!
 
+## Results
+
+Can be found in `results/flocculation`.
+
+### DE Genes
+
+|PROBEID      | adj.P.Val|  P.Value|         t|        B|      logFC|   AveExpr|ENSEMBL   |GENENAME |
+|:------------|---------:|--------:|---------:|--------:|----------:|---------:|:---------|:--------|
+|1771832_at   | 0.0001419| 0.00e+00|  9.205550| 9.055121|  0.8654733| 11.989411|YDR418W   |RPL12A   |
+|1776010_at   | 0.0001571| 1.00e-07|  8.762955| 8.357195|  1.0428640| 11.629032|YJL190C   |RPS22A   |
+|1777989_at   | 0.0006174| 3.00e-07|  7.763274| 6.773180|  0.9994524| 11.189723|YLR406C   |RPL31B   |
+|1773591_at   | 0.0007119| 5.00e-07|  7.531448| 6.383697|  1.0416106|  8.927194|YMR199W   |CLN1     |
+|1772366_at   | 0.0015277| 1.40e-06|  7.013690| 5.483140|  1.1977834| 11.651799|YML063W   |RPS1B    |
+|1776927_at   | 0.0019711| 2.40e-06|  6.716756| 4.947542|  0.8278819| 10.880286|YGL147C   |RPL9A    |
+|1773292_at   | 0.0019711| 2.50e-06|  6.689588| 4.923252|  0.6378308| 12.136133|YGR034W   |RPL26B   |
+|1777846_at   | 0.0019711| 3.40e-06|  6.540306| 4.638924|  0.6715883| 11.060921|YBL002W   |HTB2     |
+|1773827_s_at | 0.0019711| 3.40e-06|  6.525859| 4.620072|  0.5766213| 12.068804|YHL033C   |RPL8A    |
+|1776763_at   | 0.0019711| 3.80e-06|  6.488877| 4.530887|  0.7016451|  9.108503|YPL256C   |CLN2     |
+|1772978_at   | 0.0019711| 3.80e-06| -6.472194| 4.519797| -0.5752284|  8.262176|YDR430C   |CYM1     |
+|1769403_at   | 0.0041044| 8.70e-06| -6.083449| 3.759518| -0.7739060| 10.196870|YKL195W   |MIA40    |
+|1772208_at   | 0.0041594| 9.60e-06|  6.026704| 3.670536|  0.5767523| 11.099817|YBR048W   |RPS11B   |
+|1774263_at   | 0.0041965| 1.04e-05|  5.998287| 3.595161|  0.7473007|  9.645624|YNL327W   |EGT2     |
+|1773091_at   | 0.0042034| 1.13e-05|  5.959616| 3.520182|  0.7765164| 11.678413|YFR031C-A |RPL2B    |
+|1770023_at   | 0.0042034| 1.25e-05|  5.898664| 3.418212|  0.5908748| 13.024148|YDL055C   |PSA1     |
+|1776370_at   | 0.0042034| 1.26e-05|  5.904253| 3.412461|  0.7537768| 12.057036|YFR031C-A |RPL2A    |
+|1774667_at   | 0.0047992| 1.54e-05| -5.799085| 3.225383| -0.5450599|  9.621721|YGL049C   |TIF4632  |
+|1776049_at   | 0.0047992| 1.61e-05|  5.777935| 3.182707|  0.5683761| 12.634236|YNL302C   |RPS19B   |
+|1775495_at   | 0.0055168| 1.96e-05|  5.691768| 2.999526|  0.6100716|  7.731038|YDL003W   |MCD1     |
+|1770653_at   | 0.0055168| 2.05e-05|  5.674419| 2.960671|  0.7209517| 11.434438|YGR214W   |RPS0A    |
+|1778823_at   | 0.0056583| 2.20e-05| -5.640505| 2.893392| -0.6360340|  8.052246|YIL072W   |HOP1     |
+|1775193_at   | 0.0057160| 2.35e-05| -5.607095| 2.829481| -0.6077096| 10.195407|YFL036W   |RPO41    |
+|1776223_at   | 0.0057160| 2.42e-05| -5.585044| 2.800234| -0.3950174| 12.317287|YOR362C   |PRE10    |
+|1775167_at   | 0.0058560| 2.59e-05|  5.564186| 2.741431|  0.9589474| 11.829023|YER131W   |RPS26B   |
+|1776390_at   | 0.0062352| 2.95e-05| -5.493755| 2.617067| -0.4972437| 10.673441|YBL022C   |PIM1     |
+|1779099_at   | 0.0062352| 2.98e-05| -5.489394| 2.608290| -0.4162036|  8.279802|YLR095C   |IOC2     |
+|1775536_at   | 0.0064018| 3.17e-05|  5.469372| 2.551589|  1.0407435| 11.613532|YLR061W   |RPL22A   |
+|1773427_at   | 0.0074819| 3.88e-05|  5.375099| 2.361702|  0.7031388| 10.371738|YLR367W   |RPS22B   |
+|1779506_at   | 0.0074819| 3.97e-05|  5.364601| 2.340491|  1.0925925|  9.943237|YEL040W   |UTR2     |
+
+### DE Genes (treat)
+
+|PROBEID      | adj.P.Val| P.Value|        t|    logFC|  AveExpr|ENSEMBL   |GENENAME |
+|:------------|---------:|-------:|--------:|--------:|--------:|:---------|:--------|
+|1772279_at   |         0|       0| 401.1422| 15.07725| 15.07915|YMR251W-A |HOR7     |
+|1777569_at   |         0|       0| 383.2136| 14.86353| 14.85811|YBR072W   |HSP26    |
+|1774896_at   |         0|       0| 382.6178| 14.74570| 14.71289|YJR104C   |SOD1     |
+|1776636_s_at |         0|       0| 378.0824| 14.61553| 14.61095|YBR118W   |TEF2     |
+|1771705_at   |         0|       0| 376.5488| 14.73980| 14.71536|YER150W   |SPI1     |
+|1775388_at   |         0|       0| 369.9227| 14.46565| 14.44869|YJL052W   |TDH1     |
+|1774354_at   |         0|       0| 366.8373| 14.42229| 14.41623|YOL052C-A |DDR2     |
+|1771908_at   |         0|       0| 366.1760| 14.68892| 14.67079|YNL160W   |YGP1     |
+|1777549_at   |         0|       0| 355.4468| 14.61756| 14.60979|YPR036W-A |SPO24    |
+|1776517_at   |         0|       0| 354.6041| 14.32870| 14.30089|YJL151C   |SNA3     |
+
+
+
 ## Technical
 
 ### Computational Reproducibility
@@ -320,6 +376,8 @@ The tibbles are then written on-disk as feather files. [Feather](https://github.
 ```r
 arrow::write_feather(de_genes, here::here(tibbles_dir, tibble_path))
 ```
+
+I found `knitr::kable()` from `knitr` very helpful to convert the tibbles to markdown tables: `kable(df, "pipe")`.
 
 ### NASA GeneLab
 
