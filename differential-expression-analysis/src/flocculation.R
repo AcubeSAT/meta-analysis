@@ -210,28 +210,6 @@ if (arguments$qc) {
 log_info("Annotating the expressionset...")
 eset_final <- suppressMessages(annotateEset(eset_rma, yeast2.db, columns = c("PROBEID", "ENSEMBL", "GENENAME")))
 
-# Adapted from maEndtoEnd
-# http://bioconductor.org/packages/devel/workflows/html/maEndToEnd.html
-# An end to end workflow for differential gene expression
-# using Affymetrix microarrays
-
-# Get the feature data only for the filtered probes.
-# fData(eset_final)$PROBEID <- rownames(fData(eset_final))
-# fData(eset_final) <- suppressMessages(
-#     left_join(
-#         fData(eset_final),
-#         annotated_data
-#     )
-# )
-# Restore the rownames after performing the left join.
-# rownames(fData(eset_final)) <- fData(eset_final)$PROBEID
-# annotated_data <- suppressMessages(AnnotationDbi::select(
-#     yeast2.db,
-#     keys = featureNames(eset_rma),
-#     columns = c("PROBEID", "ENSEMBL", "GENENAME"),
-#     keytype = "PROBEID"
-# ))
-
 # Note there is no need to filter low-expressed genes.
 # There is no median intensity below 4, a common threshold.
 
@@ -255,14 +233,6 @@ eset_final <- eset_final[!no_ensembl_ids, ]
 # NOTE: PROBEID corresponds to probeset, not probe:
 # https://www.reddit.com/r/bioinformatics/comments/544zqi/comment/d7zpcxj/?utm_source=share&utm_medium=web2x&context=3
 # https://www.affymetrix.com/support/help/faqs/mouse_430/faq_8.affx
-
-# Grab transcript-cluster identifiers that map to multiple gene identifiers.
-# annotated_mul_mapping <- annotated_data %>%
-#     group_by(PROBEID) %>%
-#     summarize(no_of_matches = n_distinct(ENSEMBL)) %>%
-#     dplyr::filter(no_of_matches > 1)
-
-# mul_mapping_ids <- (featureNames(eset_rma) %in% annotated_mul_mapping$PROBEID)
 
 # Group membership for all samples.
 # Ground vs microgravity.
